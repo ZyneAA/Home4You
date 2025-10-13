@@ -1,3 +1,2 @@
-import "dotenv/config"
-import "./server.mjs"
-
+import "dotenv/config";
+import "./server.mjs";

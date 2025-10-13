@@ -7,6 +7,10 @@
         "build": "tsc --build",
         "start": "node ./build/index.mjs",
         "dev": "nodemon ./build/index.mjs",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "fmt": "prettier --write .",
+        "fmt:check": "prettier --check .",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
@@ -17,10 +21,16 @@
         "express": "^5.1.0"
     },
     "devDependencies": {
+        "@eslint/js": "^9.37.0",
         "@types/express": "^5.0.3",
         "@types/node": "^24.7.2",
+        "eslint": "^9.37.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.4",
         "nodemon": "^3.1.10",
+        "prettier": "^3.6.2",
         "ts-node": "^10.9.2",
-        "typescript": "^5.9.3"
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.46.0"
     }
 }
