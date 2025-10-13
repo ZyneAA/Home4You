@@ -1,0 +1,26 @@
+{
+    "name": "home4you",
+    "version": "0.0.1",
+    "main": "index.mts",
+    "type": "module",
+    "scripts": {
+        "build": "tsc --build",
+        "start": "node ./build/index.mjs",
+        "dev": "nodemon ./build/index.mjs",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "dotenv": "^17.2.3",
+        "express": "^5.1.0"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.3",
+        "@types/node": "^24.7.2",
+        "nodemon": "^3.1.10",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3"
+    }
+}

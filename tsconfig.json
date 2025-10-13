@@ -1,0 +1,48 @@
+{
+  // Visit https://aka.ms/tsconfig for docs
+  "compilerOptions": {
+    /* ===== File Layout ===== */
+    "rootDir": "./src",
+    "outDir": "./build",
+
+    /* ===== Environment ===== */
+    "target": "ESNext",                  // latest JS features
+    "module": "NodeNext",                // proper .mts/.cts behavior
+    "moduleResolution": "NodeNext",      // aligns with ESM
+    "lib": ["ESNext"],                   // for modern JS APIs
+    "types": ["node"],                   // add if using Node stuff (requires @types/node)
+
+    /* ===== Output Control ===== */
+    "declaration": true,                 // emit .d.ts
+    "declarationMap": true,              // source maps for .d.ts
+    "sourceMap": true,
+    "verbatimModuleSyntax": true,        // keep import/export syntax unchanged
+    "isolatedModules": true,             // required for ESM
+    "noEmit": false,                     // actually emit build output (set to true for type-check only)
+
+    /* ===== Strictness ===== */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    /* ===== Style & Safety ===== */
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedSideEffectImports": true,
+
+    /* ===== Module Behavior ===== */
+    "moduleDetection": "force",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build"]
+}
