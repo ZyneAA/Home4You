@@ -7,6 +7,8 @@ import cookieParser from "cookie-parser";
 
 // Locals
 import logger from "./config/logger.mjs";
+import { connectDB } from "./config/db.mjs";
+import router from "./routes/router.mjs";
 
 const app = express();
 
@@ -21,9 +23,23 @@ app.use(
     }),
 );
 
+// Connect to MongoDB
+await connectDB();
+
+// Routes
+app.use("/api", router);
+
 app.get("/", (_, res) => {
-    logger.info("Heeeeeee");
-    res.status(200).send("Ok");
+    logger.info("Test OK");
+    res.status(200).send("Welcome");
+});
+
+app.get("/health", (_, res) => {
+    res.status(200).json({
+        status: "OK",
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+    });
 });
 
 export default app;
