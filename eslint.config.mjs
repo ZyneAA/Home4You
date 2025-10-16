@@ -43,14 +43,13 @@ export default defineConfig(
             ],
             "@typescript-eslint/ban-ts-comment": "warn",
 
-            "no-undef": "off", // TS handles this
+            "no-undef": "off",
             "no-var": "error",
             "prefer-const": "error",
             eqeqeq: ["error", "smart"],
             "no-console": "warn",
             curly: ["error", "all"],
             "no-empty": ["error", { allowEmptyCatch: true }],
-
             "object-shorthand": "error",
             "arrow-body-style": ["error", "as-needed"],
             "prefer-arrow-callback": "error",
@@ -59,9 +58,8 @@ export default defineConfig(
             semi: ["error", "always"],
             indent: ["error", 4, { SwitchCase: 1 }],
             "comma-dangle": ["error", "always-multiline"],
-
             "import/extensions": "off",
             "import/no-unresolved": "off",
         },
-    }
+    },
 );
