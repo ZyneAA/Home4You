@@ -17,22 +17,23 @@ export const connectDB = async (): Promise<void> => {
         const connect = await mongoose.connect(DATABASE_URL);
         logger.info(`MongoDB connected to ${connect.connection.host}`);
 
-        // --- RESILIENCE --- 
+        // --- RESILIENCE ---
         const db = mongoose.connection;
 
-        db.on("error", (err) => {
+        db.on("error", err => {
             logger.error(`Mongoose runtime error: ${err.message}`);
         });
 
         db.on("disconnected", () => {
-            logger.warn("Mongoose disconnected! Attempting to auto-reconnect...");
+            logger.warn(
+                "Mongoose disconnected! Attempting to auto-reconnect...",
+            );
         });
 
         db.on("reconnected", () => {
             logger.info("Mongoose reconnected successfully!");
         });
         // --- END OF RESILIENCE ADDITIONS ---
-
     } catch (error) {
         logger.error(`Connection failed to MongoDB ${error}`);
         process.exit(1);
