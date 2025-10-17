@@ -17,6 +17,12 @@ const envSchema = z.object({
         .enum(["error", "warn", "info", "http", "verbose", "debug", "silly"])
         .default("info"),
     CORS_ORIGINS: z.string().optional(), // comma-separated list
+    MONGO_MAX_POOL_SIZE: z
+        .string()
+        .regex(/^\d+$/)
+        .transform(Number)
+        .default(10),
+    MONGO_MIN_POOL_SIZE: z.string().regex(/^\d+$/).transform(Number).default(2),
 });
 
 const parseResult = envSchema.safeParse(process.env);
