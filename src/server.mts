@@ -1,4 +1,3 @@
-// Locals
 import app from "./app.mjs";
 import logger from "./config/logger.mjs";
 import mongoose from "mongoose";
@@ -9,7 +8,7 @@ const server = app.listen(PORT, () => {
     logger.info(`Server started on localhost:${PORT}`);
 });
 
-const shutdown = async (signal: string) => {
+const shutdown = async (signal: string): Promise<void> => {
     try {
         logger.warn(`Received ${signal}. Shutting down gracefully...`);
         await mongoose.connection.close();

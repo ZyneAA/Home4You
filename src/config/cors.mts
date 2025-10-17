@@ -1,4 +1,3 @@
-// Local
 import logger from "./logger.mjs";
 import env from "../validations/env.validation.mjs";
 

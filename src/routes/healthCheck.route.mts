@@ -1,8 +1,6 @@
-// Libs
 import express from "express";
 import mongoose from "mongoose";
 
-// Local
 import { checkHealth } from "../controllers/healthCheck.mjs";
 
 const router = express.Router();
