@@ -1,4 +1,3 @@
-// Libs
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -7,7 +6,6 @@ import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import requestId from "./middlewares/requestId.mjs";
 
-// Locals
 import logger from "./config/logger.mjs";
 import corsOptions from "./config/cors.mjs";
 import { connectDB } from "./config/db.mjs";
@@ -16,10 +14,12 @@ import globalErrorHandler from "./middlewares/globalErrorHandler.middleware.mjs"
 
 const app = express();
 
-app.use(helmet({
-    crossOriginResourcePolicy: { policy: "same-site" },
-    crossOriginOpenerPolicy: { policy: "same-origin" },
-}));
+app.use(
+    helmet({
+        crossOriginResourcePolicy: { policy: "same-site" },
+        crossOriginOpenerPolicy: { policy: "same-origin" },
+    }),
+);
 app.use(requestId);
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));

@@ -9,7 +9,8 @@ declare module "express-serve-static-core" {
 
 const requestId: RequestHandler = (req, res, next) => {
     const incoming = req.headers["x-request-id"];
-    const id = (Array.isArray(incoming) ? incoming[0] : incoming) || randomUUID();
+    const id =
+        (Array.isArray(incoming) ? incoming[0] : incoming) || randomUUID();
     req.id = id;
     res.setHeader("X-Request-Id", id);
     res.locals["requestId"] = id;
@@ -17,4 +18,3 @@ const requestId: RequestHandler = (req, res, next) => {
 };
 
 export default requestId;
-

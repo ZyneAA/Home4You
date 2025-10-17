@@ -1,7 +1,5 @@
-// Libs
 import express from "express";
 
-// Local
 import healthCheckRoute from "./healthCheck.route.mjs";
 
 const router = express.Router();
