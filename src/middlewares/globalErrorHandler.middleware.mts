@@ -3,6 +3,7 @@ import type express from "express";
 
 // Local
 import logger from "../config/logger.mjs";
+import env from "../validations/env.validation.mjs";
 
 /**
  * Global Error Handler Middleware
@@ -17,13 +18,13 @@ const globalErrorHandler: express.ErrorRequestHandler = (err, req, res, _) => {
     });
 
     const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
+    const isClientError = statusCode >= 400 && statusCode < 500;
 
     res.status(statusCode).json({
         isSuccess: false,
         status: statusCode,
-        message: err.message || "An unexpected error occurred.",
-        stack:
-            process.env["NODE_ENV"] === "development" ? err.stack : undefined,
+        message: isClientError ? err.message : "Internal server error",
+        stack: env.NODE_ENV === "development" ? err.stack : undefined,
     });
 };
 
