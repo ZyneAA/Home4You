@@ -1,5 +1,6 @@
 // Libs
 import winston from "winston";
+import "winston-daily-rotate-file";
 
 const logger = winston.createLogger({
     level: process.env["LOG_LEVEL"] || "info",
@@ -10,11 +11,21 @@ const logger = winston.createLogger({
     ),
     defaultMeta: { service: "home4you-api" },
     transports: [
-        new winston.transports.File({
-            filename: "./logs/error.log",
+        new (winston.transports as any).DailyRotateFile({
+            filename: "./logs/%DATE%-error.log",
+            datePattern: "YYYY-MM-DD",
             level: "error",
+            maxSize: "10m",
+            maxFiles: "14d",
+            zippedArchive: true,
         }),
-        new winston.transports.File({ filename: "./logs/combined.log" }),
+        new (winston.transports as any).DailyRotateFile({
+            filename: "./logs/%DATE%-combined.log",
+            datePattern: "YYYY-MM-DD",
+            maxSize: "10m",
+            maxFiles: "14d",
+            zippedArchive: true,
+        }),
     ],
 });
 

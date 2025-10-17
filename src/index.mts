@@ -1,3 +1,3 @@
 // Locals
-import "./middlewares/globalErrorHandler.middleware.mjs"; // validates env at startup
+import "./validations/env.validation.mjs"; // Validate environment first
 import "./server.mjs";

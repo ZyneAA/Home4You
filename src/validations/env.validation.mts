@@ -9,7 +9,11 @@ const envSchema = z.object({
     NODE_ENV: z
         .enum(["development", "test", "production"])
         .default("development"),
-    PORT: z.string().regex(/^\d+$/).transform(Number).default(8000),
+    PORT: z
+        .string()
+        .regex(/^\d+$/)
+        .default(String(process.env["PORT"] ?? "8000"))
+        .transform(Number),
     DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
     LOG_LEVEL: z
         .enum(["error", "warn", "info", "http", "verbose", "debug", "silly"])
@@ -28,6 +32,6 @@ if (!parseResult.success) {
     });
     process.exit(1);
 }
-logger.info(`Env variables are good to go\n ${parseResult.data}`);
+logger.info("Environment configuration validated");
 
 export default parseResult.data;

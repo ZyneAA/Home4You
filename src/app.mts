@@ -5,6 +5,7 @@ import morgan from "morgan";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
+import requestId from "./middlewares/requestId.mjs";
 
 // Locals
 import logger from "./config/logger.mjs";
@@ -15,14 +16,21 @@ import globalErrorHandler from "./middlewares/globalErrorHandler.middleware.mjs"
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "same-site" },
+    crossOriginOpenerPolicy: { policy: "same-origin" },
+}));
+app.use(requestId);
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 app.use(cookieParser());
 app.use(
     morgan("combined", {
-        stream: { write: (message: string) => logger.info(message.trim()) },
+        stream: {
+            write: (message: string) => logger.info(message.trim()),
+        },
+        skip: req => req.path === "/api/health",
     }),
 );
 
