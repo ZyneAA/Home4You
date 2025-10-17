@@ -3,10 +3,12 @@ import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 
 // Locals
 import logger from "./config/logger.mjs";
+import corsOptions from "./config/cors.mjs";
 import { connectDB } from "./config/db.mjs";
 import router from "./routes/router.mjs";
 import globalErrorHandler from "./middlewares/globalErrorHandler.middleware.mjs";
@@ -14,15 +16,25 @@ import globalErrorHandler from "./middlewares/globalErrorHandler.middleware.mjs"
 const app = express();
 
 app.use(helmet());
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors(corsOptions));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 app.use(cookieParser());
 app.use(
     morgan("combined", {
         stream: { write: (message: string) => logger.info(message.trim()) },
     }),
 );
+
+// Basic rate limiting
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+app.use("/api", apiLimiter);
 
 // Connect to MongoDB
 await connectDB();
@@ -33,14 +45,6 @@ app.use("/api", router);
 app.get("/", (_, res) => {
     logger.info("Test OK");
     res.status(200).send("Welcome");
-});
-
-app.get("/health", (_, res) => {
-    res.status(200).json({
-        status: "OK",
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-    });
 });
 
 app.use((req, res, next) => {

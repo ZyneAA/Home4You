@@ -1,17 +1,12 @@
 // Libs
 import mongoose from "mongoose";
-import "dotenv/config";
 
 // Local
 import logger from "./logger.mjs";
+import env from "../validations/env.validation.mjs";
 
 export const connectDB = async (): Promise<void> => {
-    const DATABASE_URL = process.env["DATABASE_URL"];
-
-    if (DATABASE_URL === undefined) {
-        logger.error("DATABASE_URL undefined!");
-        process.exit(1);
-    }
+    const DATABASE_URL = env.DATABASE_URL;
 
     try {
         const connect = await mongoose.connect(DATABASE_URL);

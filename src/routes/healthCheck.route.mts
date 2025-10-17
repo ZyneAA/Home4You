@@ -2,10 +2,10 @@
 import express from "express";
 
 // Local
-import healthCheckRoute from "./healthCheck.route.mjs";
+import { checkHealth } from "../controllers/healthCheck.mjs";
 
 const router = express.Router();
 
-router.use(healthCheckRoute);
+router.get("/health", checkHealth);
 
 export default router;
