@@ -1,11 +1,13 @@
-import app from "./app.mjs";
-import logger from "./config/logger.mjs";
 import mongoose from "mongoose";
 
-const PORT = process.env["PORT"] || 8000;
+import app from "./app.mjs";
+import logger from "./config/logger.mjs";
+import env from "./validations/env.validation.mjs";
+
+const PORT = env.PORT;
 
 const server = app.listen(PORT, () => {
-    logger.info(`Server started on localhost:${PORT}`);
+    logger.info(`Server started on port: ${PORT}`);
 });
 
 const shutdown = async (signal: string): Promise<void> => {
@@ -20,7 +22,7 @@ const shutdown = async (signal: string): Promise<void> => {
         setTimeout(() => {
             logger.error("Force exiting after graceful shutdown timeout");
             process.exit(1);
-        }, 10000).unref();
+        }, 30000).unref();
     } catch (err) {
         logger.error(`Error during shutdown: ${(err as Error).message}`);
         process.exit(1);

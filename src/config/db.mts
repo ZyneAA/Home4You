@@ -7,7 +7,20 @@ export const connectDB = async (): Promise<void> => {
     const DATABASE_URL = env.DATABASE_URL;
 
     try {
-        const connect = await mongoose.connect(DATABASE_URL);
+        const connect = await mongoose.connect(DATABASE_URL, {
+            maxPoolSize:
+                env.NODE_ENV === "production" ? env.MONGO_MAX_POOL_SIZE : 10,
+            minPoolSize:
+                env.NODE_ENV === "production" ? env.MONGO_MIN_POOL_SIZE : 2,
+            maxIdleTimeMS: 30000,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+            bufferCommands: false,
+            retryWrites: true,
+            retryReads: true,
+            compressors: ["zlib"],
+            heartbeatFrequencyMS: 10000,
+        });
         logger.info(`MongoDB connected to ${connect.connection.host}`);
 
         // --- RESILIENCE ---
