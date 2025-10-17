@@ -24,12 +24,6 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
-            - name: Run ESLint
-              run: npm run lint:fix
-
-            - name: Run prettier
-              run: npm run fmt
-
             - name: Check linting
               run: npm run lint
 
