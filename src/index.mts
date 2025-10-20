@@ -5,7 +5,7 @@ import redisClient from "./config/redis.mjs";
 import logger from "./config/logger.mjs";
 import "./server.mjs";
 
-async function startApp() {
+async function startApp(): Promise<void> {
     try {
         await connectDB();
 
@@ -21,4 +21,3 @@ async function startApp() {
 }
 
 startApp();
-

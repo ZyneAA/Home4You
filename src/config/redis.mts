@@ -6,9 +6,11 @@ import logger from "./logger.mjs";
 const redisClient = createClient({
     url: env.REDIS_URL,
     socket: {
-        reconnectStrategy: (retries) => {
+        reconnectStrategy: retries => {
             const delay = Math.min(retries * 100, 3000); // capped exponential backoff
-            logger.warn(`Redis reconnect attempt #${retries}, retrying in ${delay}ms`);
+            logger.warn(
+                `Redis reconnect attempt #${retries}, retrying in ${delay}ms`,
+            );
             return delay;
         },
     },
