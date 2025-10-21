@@ -5,7 +5,7 @@ import globals from "globals";
 
 export default defineConfig(
     {
-        ignores: ["build/", "node_modules/", "dist/", "coverage/"],
+        ignores: ["build/", "node_modules/", "dist/", "coverage/", "src/tests"],
     },
     js.configs.recommended,
     ...tseslint.configs.recommended,

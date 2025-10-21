@@ -48,7 +48,6 @@ const REDIS_ERROR_LOG_INTERVAL_MS = 60_000; // throttle logs to once/min
 
 const ensureLuaScript = async (): Promise<string | null> => {
     if (luaSha) {
-        console.log("scs");
         return luaSha;
     }
 
@@ -56,7 +55,7 @@ const ensureLuaScript = async (): Promise<string | null> => {
     try {
         if (typeof client.scriptLoad === "function") {
             luaSha = await client.scriptLoad(LUA_SCRIPT);
-            logger.info("The sha: " +luaSha);
+            logger.info("The sha: " + luaSha);
             return luaSha;
         }
 
