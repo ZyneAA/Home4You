@@ -16,14 +16,14 @@ const redisClient = createClient({
     },
 });
 
-(async () => {
+export const initRedis = async (): Promise<void> => {
     try {
         await redisClient.connect();
         logger.info("Redis client initialized successfully");
     } catch (err) {
         logger.error("Failed to connect to Redis:", err);
-        process.exit(1); // fail fast
+        throw err;
     }
-})();
+};
 
 export default redisClient;

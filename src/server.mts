@@ -1,15 +1,30 @@
 import mongoose from "mongoose";
+
 import app from "./app.mjs";
 import logger from "./config/logger.mjs";
 import env from "./validations/env.validation.mjs";
 import redisClient from "./config/redis.mjs";
+import { connectDB } from "./config/db.mjs";
+import { initRedis } from "./config/redis.mjs";
+
+let server;
 
 const PORT = env.PORT;
 let shuttingDown = false;
 
-const server = app.listen(PORT, () => {
-    logger.info(`Server started on port ${PORT}`);
-});
+try {
+    await connectDB();
+    await initRedis();
+
+    server = app.listen(PORT, () => {
+        logger.info(`Server started on port ${PORT}`);
+    });
+
+    logger.info("All dependencies initialized. Starting server...");
+} catch (err) {
+    logger.error("App startup failed:", err);
+    process.exit(1);
+}
 
 const shutdown = async (signal: string): Promise<void> => {
     setTimeout(() => {

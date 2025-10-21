@@ -42,6 +42,7 @@ export default defineConfig(
                 { default: "array-simple" },
             ],
             "@typescript-eslint/ban-ts-comment": "warn",
+            "@typescript-eslint/no-explicit-any": "off",
 
             "no-undef": "off",
             "no-var": "error",
