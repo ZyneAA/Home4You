@@ -16,10 +16,10 @@ const app = express();
 
 app.use(compression()); // Best to use it in reverse proxy
 app.use(
-    helmet({
-        crossOriginResourcePolicy: { policy: "same-site" },
-        crossOriginOpenerPolicy: { policy: "same-origin" },
-    }),
+  helmet({
+    crossOriginResourcePolicy: { policy: "same-site" },
+    crossOriginOpenerPolicy: { policy: "same-origin" },
+  }),
 );
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
@@ -31,13 +31,13 @@ app.set("trust proxy", true);
 app.use(requestId, morganMiddleware, rateLimit);
 app.use("/api", router);
 app.use((req, _res, next) => {
-    const err = new AppError(
-        `Can't find the endpoint on the server ${req.originalUrl}`,
-        404,
-        undefined,
-        true,
-    );
-    next(err);
+  const err = new AppError(
+    `Can't find the endpoint on the server ${req.originalUrl}`,
+    404,
+    undefined,
+    true,
+  );
+  next(err);
 });
 app.use(globalErrorHandler);
 
