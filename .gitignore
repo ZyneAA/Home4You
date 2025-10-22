@@ -143,3 +143,5 @@ vite.config.ts.timestamp-*
 
 # others
 dump.rdb
+.DS_Store
+temp.txt
