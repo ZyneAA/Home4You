@@ -23,10 +23,13 @@ const envSchema = z.object({
   MONGO_MIN_POOL_SIZE: z.string().regex(/^\d+$/).transform(Number).default(2),
 
   // Redis related
-  REDIS_URL: z.string().min(1, "DATABASE_URL is required"),
+  REDIS_URL: z.string().min(1, "REDIS_URL is required"),
   LIMIT: z.string().regex(/^\d+$/).transform(Number).default(100),
   WINDOW_SIZE: z.string().regex(/^\d+$/).transform(Number).default(15),
   SUB_WINDOW_SIZE: z.string().regex(/^\d+$/).transform(Number).default(5),
+
+  // JWT
+  JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
 });
 
 const parseResult = envSchema.safeParse(process.env);

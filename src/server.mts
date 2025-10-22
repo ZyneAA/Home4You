@@ -20,7 +20,6 @@ try {
   server = app.listen(PORT, () => {
     logger.info(`Server started on port ${PORT}`);
   });
-
 } catch (err) {
   logger.error("App startup failed:", err);
   process.exit(1);
