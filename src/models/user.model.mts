@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import type { InferSchemaType } from "mongoose";
 import argon2 from "argon2";
 
 import type { IUser } from "../types/user.type.mjs";
@@ -116,6 +117,5 @@ UserSchema.methods["incrementFailedLogin"] = async function (
   await this.save();
 };
 
-const User = model("User", UserSchema);
-
-export default User;
+export type CreatedUser = InferSchemaType<typeof UserSchema>;
+export const User = model("User", UserSchema);

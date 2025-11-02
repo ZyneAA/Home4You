@@ -4,12 +4,16 @@ export default class AppError extends Error {
   public readonly isOperational: boolean;
 
   constructor(
-    message: string,
+    message: string | string[],
     statusCode = 500,
     code?: string,
     isOperational = true,
   ) {
-    super(message);
+    const normalizedMessage = Array.isArray(message)
+      ? message.join("; ")
+      : message;
+
+    super(normalizedMessage);
     this.statusCode = statusCode;
     this.code = code;
     this.isOperational = isOperational;
