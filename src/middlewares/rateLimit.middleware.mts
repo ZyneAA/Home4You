@@ -68,7 +68,7 @@ const ensureLuaScript = async (): Promise<string | null> => {
       } catch {
         try {
           await client.eval(LUA_SCRIPT);
-        } catch {}
+        } catch { }
       }
     }
   } catch (err) {
@@ -206,3 +206,4 @@ const rateLimit: RequestHandler = async (req, res, next) => {
 };
 
 export default rateLimit;
+

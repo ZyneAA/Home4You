@@ -26,6 +26,12 @@ export interface IUser extends mongoose.Document {
   generatePasswordResetToken(ttlMs?: number): Promise<string>;
 }
 
+export interface ICreateUser {
+  fullName: string;
+  email: string;
+  password: string;
+}
+
 export function createTokenHash(): { token: string; hash: string } {
   const token = crypto.randomBytes(32).toString("hex");
   const hash = crypto.createHash("sha256").update(token).digest("hex");
