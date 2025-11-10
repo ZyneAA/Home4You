@@ -1,9 +1,9 @@
 import { createClient } from "redis";
 
-import env from "../validations/env.validation.mjs";
-import logger from "./logger.mjs";
+import { logger } from "@utils";
+import { env } from "@shared/validations";
 
-const redisClient = createClient({
+export const redisClient = createClient({
   url: env.REDIS_URL,
   socket: {
     reconnectStrategy: retries => {
@@ -25,5 +25,3 @@ export const initRedis = async (): Promise<void> => {
     throw err;
   }
 };
-
-export default redisClient;

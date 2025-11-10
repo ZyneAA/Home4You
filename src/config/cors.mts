@@ -1,5 +1,5 @@
-import logger from "./logger.mjs";
-import env from "../validations/env.validation.mjs";
+import { logger } from "@utils";
+import { env } from "@shared/validations";
 
 type CorsCallback = (err: Error | null, allow?: boolean) => void;
 const allowedOrigins: Set<string> = new Set(
@@ -9,7 +9,7 @@ const allowedOrigins: Set<string> = new Set(
     .filter(Boolean),
 );
 
-const corsOptions = {
+export const corsOptions = {
   origin: (origin: string | undefined, callback: CorsCallback) => {
     // Allow reqs with no Origin header(e.g mobile, cURL, etc)
     if (!origin) {
@@ -26,5 +26,3 @@ const corsOptions = {
   },
   credentials: true,
 };
-
-export default corsOptions;

@@ -1,9 +1,8 @@
 import type { RequestHandler } from "express";
 
-import env from "../validations/env.validation.mjs";
-import redisClient from "../config/redis.mjs";
-import AppError from "../config/error.mjs";
-import logger from "../config/logger.mjs";
+import { env } from "@shared/validations";
+import { logger, AppError } from "@utils";
+import { redisClient } from "@config";
 
 const LUA_SCRIPT = `
   local key = KEYS[1]
@@ -68,7 +67,7 @@ const ensureLuaScript = async (): Promise<string | null> => {
       } catch {
         try {
           await client.eval(LUA_SCRIPT);
-        } catch { }
+        } catch {}
       }
     }
   } catch (err) {
@@ -150,7 +149,7 @@ async function runLua(key: string, args: string[]): Promise<[number, number]> {
 }
 
 // --- Middleware ---
-const rateLimit: RequestHandler = async (req, res, next) => {
+export const rateLimit: RequestHandler = async (req, res, next) => {
   const key = `rate_limit:${req.ip}`;
   const now = Date.now();
   const WINDOW_SIZE = Number(env.WINDOW_SIZE);
@@ -204,6 +203,3 @@ const rateLimit: RequestHandler = async (req, res, next) => {
     next();
   }
 };
-
-export default rateLimit;
-

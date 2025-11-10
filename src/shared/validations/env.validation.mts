@@ -1,7 +1,7 @@
 import { z } from "zod";
 import "dotenv/config";
 
-import logger from "../config/logger.mjs";
+import { logger } from "@utils";
 
 const envSchema = z.object({
   NODE_ENV: z
@@ -45,4 +45,4 @@ if (!parseResult.success) {
 }
 logger.info("Environment configuration validated");
 
-export default parseResult.data;
+export const env = parseResult.data;

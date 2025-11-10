@@ -1,11 +1,9 @@
 import mongoose from "mongoose";
 
 import app from "./app.mjs";
-import logger from "./config/logger.mjs";
-import env from "./validations/env.validation.mjs";
-import redisClient from "./config/redis.mjs";
-import { connectDB } from "./config/db.mjs";
-import { initRedis } from "./config/redis.mjs";
+import { logger } from "@utils";
+import { env } from "@shared/validations";
+import { initRedis, connectDB, redisClient } from "@config";
 
 let server;
 
@@ -13,8 +11,7 @@ const PORT = env.PORT;
 let shuttingDown = false;
 
 try {
-  await connectDB();
-  await initRedis();
+  await Promise.all([connectDB(), initRedis()]);
 
   logger.info("All dependencies initialized. Starting server...");
   server = app.listen(PORT, () => {
