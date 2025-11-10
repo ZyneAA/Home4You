@@ -4,13 +4,15 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 
-import corsOptions from "./config/cors.mjs";
-import router from "./routes/router.mjs";
-import globalErrorHandler from "./middlewares/globalErrorHandler.middleware.mjs";
-import requestId from "./middlewares/requestId.middleware.mjs";
-import morganMiddleware from "./middlewares/morgan.middleware.mjs";
-import rateLimit from "./middlewares/rateLimit.middleware.mjs";
-import AppError from "./config/error.mjs";
+import { corsOptions } from "@config";
+import { AppError } from "@utils";
+import router from "@modules";
+import {
+  globalErrorHandler,
+  requestId,
+  rateLimit,
+  morganMiddleware,
+} from "@middlewares";
 
 const app = express();
 

@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
 
-import env from "../validations/env.validation.mjs";
-import logger from "../config/logger.mjs";
-import AppError from "../config/error.mjs";
+import { env } from "@shared/validations";
+import { logger, AppError } from "@utils";
 
-const jwtToken = {
+export const jwtToken = {
   sign: (payload: string): string => {
     try {
       return jwt.sign(payload, env.JWT_SECRET, { expiresIn: "15m" });
@@ -22,5 +21,3 @@ const jwtToken = {
     }
   },
 };
-
-export default jwtToken;

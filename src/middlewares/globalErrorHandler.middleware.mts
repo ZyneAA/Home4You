@@ -1,15 +1,19 @@
 import type express from "express";
 import { ZodError } from "zod";
 
-import logger from "../config/logger.mjs";
-import env from "../validations/env.validation.mjs";
-import AppError from "../config/error.mjs";
+import { logger, AppError } from "@utils";
+import { env } from "@shared/validations";
 
 /**
  * Global Error Handler Middleware
  */
 
-const globalErrorHandler: express.ErrorRequestHandler = (err, req, res, _) => {
+export const globalErrorHandler: express.ErrorRequestHandler = (
+  err,
+  req,
+  res,
+  _,
+) => {
   logger.error(`[Global Error] ${err.message}`, {
     stack: err.stack,
     url: req.originalUrl,
@@ -51,5 +55,3 @@ const globalErrorHandler: express.ErrorRequestHandler = (err, req, res, _) => {
     stack: env.NODE_ENV === "development" ? err.stack : undefined,
   });
 };
-
-export default globalErrorHandler;
