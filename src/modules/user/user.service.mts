@@ -1,5 +1,3 @@
-import argon2 from "argon2";
-
 import { User } from "./user.model.mjs";
 import type { IUser } from "./types/user.type.mjs";
 import type { CreateUserDto } from "./dtos/create-user.dto.mjs";
@@ -13,17 +11,10 @@ export const userService = {
       throw new AppError("An account with this email already exists.", 409);
     }
 
-    const passwordHash = await argon2.hash(userData.password, {
-      type: argon2.argon2id,
-      memoryCost: 2 ** 16,
-      timeCost: 5,
-      parallelism: 2,
-    });
-
     const newUser = new User({
       ...userData,
-      passwordHash,
     });
+    await newUser.setPassword(userData.password);
 
     await newUser.save();
     return newUser;

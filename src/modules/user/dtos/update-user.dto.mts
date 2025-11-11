@@ -6,7 +6,7 @@ export const updateUserDtoSchema = z.object({
       .string()
       .min(2, "Full name must be at least 2 characters")
       .optional(),
-    email: z.string().email("A valid email is required").optional(),
+    email: z.email()
   }),
   params: z.object({
     id: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid ID format"),

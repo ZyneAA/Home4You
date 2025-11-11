@@ -20,4 +20,12 @@ export const jwtToken = {
       throw new AppError("Failed to authenticate token", 500);
     }
   },
+  signRefreshToken: (payload: string): string => {
+    try {
+      return jwt.sign(payload, env.JWT_REFRESH_SECRET, { expiresIn: "30d" });
+    } catch (err) {
+      logger.error("Error signing jwt token: ", err);
+      throw new AppError("Failed to authenticate token", 500)
+    }
+  }
 };
