@@ -46,7 +46,8 @@ describe("UserService", () => {
 
       userService.createUser = async (data: any): Promise<any> => {
         const exists = await User.findOne({ email: data.email });
-        if (exists) throw new AppError("An account with this email already exists.", 409);
+        if (exists)
+          throw new AppError("An account with this email already exists.", 409);
         const u = mockConstructor();
         u.setPassword(data.password);
         await u.save();
@@ -70,7 +71,7 @@ describe("UserService", () => {
       (User.findOne as any).mockResolvedValue(userData);
 
       await expect(userService.createUser(userData)).rejects.toThrow(
-        "An account with this email already exists."
+        "An account with this email already exists.",
       );
     });
   });
@@ -112,7 +113,9 @@ describe("UserService", () => {
     it("should throw an error if user not found", async () => {
       (User.findById as any).mockResolvedValue(null);
 
-      await expect(userService.getUserById("123")).rejects.toThrow("User not found");
+      await expect(userService.getUserById("123")).rejects.toThrow(
+        "User not found",
+      );
     });
   });
 });

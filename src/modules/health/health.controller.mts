@@ -17,7 +17,7 @@ export const getRedisStatus = async (): Promise<string> => {
     }
   }
 
-  return `disconnected (Current State: ${redisClient.options?.socket?.connectTimeout ? 'connecting' : 'not attempted'})`;
+  return `disconnected (Current State: ${redisClient.options?.socket?.connectTimeout ? "connecting" : "not attempted"})`;
 };
 
 export const checkHealth = async (_: Request, res: Response): Promise<void> => {

@@ -10,7 +10,8 @@ const router = Router();
 // All user routes are protected
 // router.use(authMiddleware);
 
-router.route("/user")
+router
+  .route("/user")
   .get(userController.getAllUsers)
   .post(validateDto(createUserDtoSchema), userController.createUser);
 

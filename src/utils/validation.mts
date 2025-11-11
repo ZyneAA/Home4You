@@ -9,4 +9,3 @@ export const formatValidationError = (errors: ZodError): string => {
   }
   return JSON.stringify(errors);
 };
-

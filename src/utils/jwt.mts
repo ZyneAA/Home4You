@@ -25,7 +25,7 @@ export const jwtToken = {
       return jwt.sign(payload, env.JWT_REFRESH_SECRET, { expiresIn: "30d" });
     } catch (err) {
       logger.error("Error signing jwt token: ", err);
-      throw new AppError("Failed to authenticate token", 500)
+      throw new AppError("Failed to authenticate token", 500);
     }
-  }
+  },
 };
