@@ -1,8 +1,24 @@
 import type { Request, Response } from "express";
 import mongoose from "mongoose";
 
-// A simple redis client mock for health check as redis setup is not in scope of this refactoring
-const getRedisStatus = async (): Promise<string> => "connected";
+import { redisClient } from "@config";
+
+export const getRedisStatus = async (): Promise<string> => {
+  if (!redisClient) {
+    return "uninitialized";
+  }
+
+  const status = redisClient.isOpen ? "connected" : "disconnected";
+  if (status === "connected") {
+    try {
+      return "connected";
+    } catch (error) {
+      return `connected but failed LIVENESS check (Error: ${(error as Error).message})`;
+    }
+  }
+
+  return `disconnected (Current State: ${redisClient.options?.socket?.connectTimeout ? "connecting" : "not attempted"})`;
+};
 
 export const checkHealth = async (_: Request, res: Response): Promise<void> => {
   const health = {

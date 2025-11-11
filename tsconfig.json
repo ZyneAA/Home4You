@@ -8,13 +8,13 @@
     "moduleResolution": "NodeNext", // aligns with ESM
     "baseUrl": "./src",
     "paths": {
-      "@config": ["config/index.mjs"],
+      "@config": ["config/index.mts"],
       "@shared/validations": ["shared/validations/index.mts"],
-      "@utils": ["utils/index.mjs"],
-      "@middlewares": ["middlewares/index.mjs"],
-      "@validations": ["validations/index.mjs"],
-      "@modules": ["modules/index.mjs"],
-      "@modules/": ["modules/*"]
+      "@utils": ["utils/index.mts"],
+      "@middlewares": ["middlewares/index.mts"],
+      "@validations": ["validations/index.mts"],
+      "@modules": ["modules/index.mts"],
+      "@modules/*": ["modules/*"]
     },
     "lib": ["ESNext"],
     "types": ["node"],
@@ -47,5 +47,5 @@
     "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "build", "src/tests/load_tests"]
+  "exclude": ["node_modules", "build", "src/tests/*"]
 }

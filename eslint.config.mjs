@@ -2,18 +2,17 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
-import prettier from "eslint-config-prettier";
+import prettier from "eslint-plugin-prettier";
+import eslintConfigPrettier from "eslint-config-prettier";
 
-export default defineConfig(
+export default defineConfig([
   {
     ignores: ["build/", "node_modules/", "dist/", "coverage/", "src/tests"],
   },
-  prettier,
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
     files: ["src/**/*.ts", "src/**/*.mts"],
-
     languageOptions: {
       parserOptions: {
         project: "./tsconfig.json",
@@ -22,11 +21,15 @@ export default defineConfig(
       },
       globals: {
         ...globals.node,
-        ...globals.tseslint,
       },
     },
-
+    plugins: {
+      prettier,
+    },
     rules: {
+      ...eslintConfigPrettier.rules,
+      "prettier/prettier": "error",
+
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
@@ -54,12 +57,8 @@ export default defineConfig(
       "arrow-body-style": ["error", "as-needed"],
       "prefer-arrow-callback": "error",
       "no-multi-spaces": "error",
-      quotes: ["error", "double", { avoidEscape: true }],
-      semi: ["error", "always"],
-      indent: ["error", 2, { SwitchCase: 1 }],
-      "comma-dangle": ["error", "always-multiline"],
       "import/extensions": "off",
       "import/no-unresolved": "off",
     },
   },
-);
+]);

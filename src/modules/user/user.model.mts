@@ -34,6 +34,7 @@ const UserSchema = new Schema<IUser>(
     versionKey: "version",
     optimisticConcurrency: true,
     toJSON: {
+      virtuals: true,
       transform(_doc, ret) {
         // remove sensitive/internal fields when serializing
         delete ret.passwordHash;
@@ -43,6 +44,7 @@ const UserSchema = new Schema<IUser>(
         delete ret.resetPasswordTokenExpires;
         delete ret.failedLoginAttempts;
         delete ret.lockUntil;
+        delete ret._id;
         return ret;
       },
     },
