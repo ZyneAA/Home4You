@@ -4,6 +4,8 @@ import { defineConfig } from "eslint/config";
 import globals from "globals";
 import prettier from "eslint-plugin-prettier";
 import eslintConfigPrettier from "eslint-config-prettier";
+import unusedImports from "eslint-plugin-unused-imports";
+import pluginImport from "eslint-plugin-import";
 
 export default defineConfig([
   {
@@ -12,7 +14,7 @@ export default defineConfig([
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ["src/**/*.ts", "src/**/*.mts"],
+    files: ["src/**/*.ts", "src/**/*.mts", "src/tests/**/*.ts"],
     languageOptions: {
       parserOptions: {
         project: "./tsconfig.json",
@@ -25,10 +27,14 @@ export default defineConfig([
     },
     plugins: {
       prettier,
+      "unused-imports": unusedImports,
+      import: pluginImport,
     },
     rules: {
       ...eslintConfigPrettier.rules,
       "prettier/prettier": "error",
+
+      "unused-imports/no-unused-imports": "error",
 
       "@typescript-eslint/no-unused-vars": [
         "error",
@@ -59,6 +65,24 @@ export default defineConfig([
       "no-multi-spaces": "error",
       "import/extensions": "off",
       "import/no-unresolved": "off",
+      "import/order": [
+        "error",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+          ],
+          "newlines-between": "always",
+          alphabetize: {
+            order: "asc",
+            caseInsensitive: true,
+          },
+        },
+      ],
     },
   },
 ]);

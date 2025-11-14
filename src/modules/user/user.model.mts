@@ -1,6 +1,6 @@
+import argon2 from "argon2";
 import { model, Schema } from "mongoose";
 import type { InferSchemaType } from "mongoose";
-import argon2 from "argon2";
 
 import type { IUser } from "./types/user.type.mjs";
 import { createTokenHash } from "./types/user.type.mjs";
@@ -61,7 +61,6 @@ UserSchema.methods["setPassword"] = async function (
   });
   this.failedLoginAttempts = 0;
   this.lockUntil = null;
-  await this.save();
 };
 
 UserSchema.methods["comparePassword"] = async function (

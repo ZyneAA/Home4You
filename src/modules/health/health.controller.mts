@@ -1,7 +1,6 @@
+import { redisClient } from "@config";
 import type { Request, Response } from "express";
 import mongoose from "mongoose";
-
-import { redisClient } from "@config";
 
 export const getRedisStatus = async (): Promise<string> => {
   if (!redisClient) {

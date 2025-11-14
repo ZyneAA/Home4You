@@ -1,5 +1,6 @@
-import type { RequestHandler } from "express";
 import { randomUUID } from "crypto";
+
+import type { RequestHandler } from "express";
 
 declare module "express-serve-static-core" {
   interface Request {

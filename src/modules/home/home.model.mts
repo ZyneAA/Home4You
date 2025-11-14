@@ -53,6 +53,5 @@ const HomeSchema = new Schema(
   },
 );
 
-
 export type CreatedHome = InferSchemaType<typeof HomeSchema>;
 export const Home = model("Home", HomeSchema);

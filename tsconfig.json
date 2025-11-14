@@ -14,6 +14,7 @@
       "@middlewares": ["middlewares/index.mts"],
       "@validations": ["validations/index.mts"],
       "@modules": ["modules/index.mts"],
+      "@modules/user": ["modules/user/index.mts"],
       "@modules/*": ["modules/*"]
     },
     "lib": ["ESNext"],

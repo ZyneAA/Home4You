@@ -1,22 +1,21 @@
-import express from "express";
-import helmet from "helmet";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import compression from "compression";
-
 import { corsOptions } from "@config";
-import { AppError } from "@utils";
-import router from "@modules";
 import {
   globalErrorHandler,
   requestId,
   rateLimit,
   morganMiddleware,
 } from "@middlewares";
+import router from "@modules";
+import { AppError } from "@utils";
+import compression from "compression";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import express from "express";
+import helmet from "helmet";
 
 const app = express();
 
-app.use(compression()); // Best to use it in reverse proxy
+app.use(compression());
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "same-site" },

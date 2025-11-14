@@ -1,9 +1,9 @@
+import { initRedis, connectDB, redisClient } from "@config";
+import { env } from "@shared/validations";
+import { logger } from "@utils";
 import mongoose from "mongoose";
 
 import app from "./app.mjs";
-import { logger } from "@utils";
-import { env } from "@shared/validations";
-import { initRedis, connectDB, redisClient } from "@config";
 
 let server;
 

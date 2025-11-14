@@ -1,8 +1,7 @@
-import type { RequestHandler } from "express";
-
+import { redisClient } from "@config";
 import { env } from "@shared/validations";
 import { logger, AppError } from "@utils";
-import { redisClient } from "@config";
+import type { RequestHandler } from "express";
 
 const LUA_SCRIPT = `
   local key = KEYS[1]

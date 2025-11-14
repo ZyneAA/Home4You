@@ -1,7 +1,6 @@
-import morgan from "morgan";
-import type express from "express";
-
 import { logger } from "@utils";
+import type express from "express";
+import morgan from "morgan";
 
 morgan.token("id", (req: express.Request) => req.id || "-");
 export const morganMiddleware = morgan(

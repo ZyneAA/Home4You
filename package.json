@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "start": "node ./build/index.mjs",
-    "dev": "nodemon ./build/index.mjs",
+    "dev": "nodemon --watch './build/' ./build/index.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "fmt": "prettier --write .",
@@ -31,6 +31,7 @@
     "mongoose": "^8.19.1",
     "morgan": "^1.10.1",
     "redis": "^5.8.3",
+    "ua-parser-js": "^2.0.6",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0",
     "zod": "^4.1.12"
@@ -47,7 +48,9 @@
     "@vitest/coverage-v8": "^4.0.8",
     "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-unused-imports": "^4.3.0",
     "husky": "^9.1.7",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",

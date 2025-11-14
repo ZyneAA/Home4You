@@ -1,12 +1,7 @@
+import { env } from "@shared/validations";
+import { logger, AppError } from "@utils";
 import type express from "express";
 import { ZodError } from "zod";
-
-import { logger, AppError } from "@utils";
-import { env } from "@shared/validations";
-
-/**
- * Global Error Handler Middleware
- */
 
 export const globalErrorHandler: express.ErrorRequestHandler = (
   err,
