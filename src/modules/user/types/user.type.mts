@@ -1,5 +1,6 @@
-import type mongoose from "mongoose";
 import crypto from "crypto";
+
+import type mongoose from "mongoose";
 
 export interface IUser extends mongoose.Document {
   fullName: string;
@@ -24,12 +25,6 @@ export interface IUser extends mongoose.Document {
   comparePassword(password: string): Promise<boolean>;
   generateVerificationToken(ttlMs?: number): Promise<string>;
   generatePasswordResetToken(ttlMs?: number): Promise<string>;
-}
-
-export interface ICreateUser {
-  fullName: string;
-  email: string;
-  password: string;
 }
 
 export function createTokenHash(): { token: string; hash: string } {

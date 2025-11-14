@@ -1,7 +1,7 @@
+import { AppError } from "@utils";
 import type { Request, Response, NextFunction } from "express";
 import type { ZodObject } from "zod";
 import { ZodError } from "zod";
-import { AppError } from "@utils";
 
 export const validateDto =
   (schema: ZodObject) =>
@@ -15,12 +15,8 @@ export const validateDto =
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const errorMessages = error.issues
-          .map(issue => ({
-            message: `${issue.path.join(".")} is ${issue.message.toLowerCase()}`,
-          }))
-          .join(", ");
-        next(new AppError("Validation failed", 400, errorMessages));
+        const errorLog = error.issues.map(e => e.message).join("\n");
+        next(new AppError(`Validation failed: ${errorLog}`, 400));
       } else {
         next(new AppError("Internal server error", 500));
       }

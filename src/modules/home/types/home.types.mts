@@ -1,5 +1,6 @@
-import type mongoose from "mongoose";
 import crypto from "crypto";
+
+import type mongoose from "mongoose";
 
 /**
  * Interface for a Home document stored in MongoDB

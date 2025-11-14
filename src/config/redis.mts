@@ -1,7 +1,6 @@
-import { createClient } from "redis";
-
-import { logger } from "@utils";
 import { env } from "@shared/validations";
+import { logger } from "@utils";
+import { createClient } from "redis";
 
 export const redisClient = createClient({
   url: env.REDIS_URL,

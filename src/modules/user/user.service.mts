@@ -1,8 +1,9 @@
-import { User } from "./user.model.mjs";
-import type { IUser } from "./types/user.type.mjs";
+import { AppError } from "@utils";
+
 import type { CreateUserDto } from "./dtos/create-user.dto.mjs";
 import type { UpdateUserDto } from "./dtos/update-user.dto.mjs";
-import { AppError } from "@utils";
+import type { IUser } from "./types/user.type.mjs";
+import { User } from "./user.model.mjs";
 
 export const userService = {
   async createUser(userData: CreateUserDto): Promise<IUser> {
@@ -14,9 +15,11 @@ export const userService = {
     const newUser = new User({
       ...userData,
     });
+
     await newUser.setPassword(userData.password);
 
     await newUser.save();
+
     return newUser;
   },
 

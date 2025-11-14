@@ -1,7 +1,6 @@
-import mongoose from "mongoose";
-
-import { logger } from "@utils";
 import { env } from "@shared/validations";
+import { logger } from "@utils";
+import mongoose from "mongoose";
 
 export const connectDB = async (): Promise<void> => {
   const DATABASE_URL = env.DATABASE_URL;

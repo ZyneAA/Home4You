@@ -1,7 +1,6 @@
+import { logger } from "@utils";
 import { z } from "zod";
 import "dotenv/config";
-
-import { logger } from "@utils";
 
 const envSchema = z.object({
   NODE_ENV: z

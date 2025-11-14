@@ -1,6 +1,5 @@
-import type { Request, Response } from "express";
-
 import { env } from "@shared/validations";
+import type { Request, Response } from "express";
 
 export const getOptions = (): {
   httpOnly: boolean;

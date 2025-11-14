@@ -1,5 +1,5 @@
-import { logger } from "@utils";
 import { env } from "@shared/validations";
+import { logger } from "@utils";
 
 type CorsCallback = (err: Error | null, allow?: boolean) => void;
 const allowedOrigins: Set<string> = new Set(

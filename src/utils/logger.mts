@@ -36,7 +36,11 @@ if (NODE_ENV !== "production") {
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.simple(),
+        winston.format.printf(({ level, message, stack, timestamp }) =>
+          stack
+            ? `[${timestamp}] ${level}: ${message as string}\n  ${stack}`
+            : `[${timestamp}] ${level}: ${message as string}`,
+        ),
       ),
     }),
   );

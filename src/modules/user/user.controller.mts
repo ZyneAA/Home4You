@@ -1,11 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
 
-import { userService } from "./user.service.mjs";
 import type { CreateUserDto } from "./dtos/create-user.dto.mjs";
 import type {
   UpdateUserDto,
   UpdateUserParams,
 } from "./dtos/update-user.dto.mjs";
+import { userService } from "./user.service.mjs";
 
 export const userController = {
   async createUser(
