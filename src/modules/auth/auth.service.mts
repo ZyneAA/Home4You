@@ -1,17 +1,19 @@
 import crypto from "crypto";
 
 import { userService, User } from "@modules/user";
+import { env } from "@shared/validations";
 import { jwtToken, logger } from "@utils";
 import { AppError } from "@utils";
 import argon2 from "argon2";
 
 import { AuthSession } from "./auth.model.mjs";
-import type { AuthSessionDto } from "./dtos/auth.dto.mjs";
 import type { LoginDto } from "./dtos/login.dto.mjs";
+import type { LogoutDto } from "./dtos/logout.dto.mjs";
+import type { RegisterDto } from "./dtos/register.dto.mjs";
 
 export const authService = {
   async register(
-    dto: AuthSessionDto,
+    dto: RegisterDto,
     ipAddress: string | unknown,
     userAgent: string,
   ) {
@@ -55,8 +57,8 @@ export const authService = {
       if (user.failedLoginAttempts !== undefined) {
         user.failedLoginAttempts += 1;
 
-        if (user.failedLoginAttempts >= 10) {
-          user.lockUntil = new Date(Date.now() + 15 * 60 * 1000);
+        if (user.failedLoginAttempts >= env.FAILED_LOGIN_ATTEMPT) {
+          user.lockUntil = new Date(Date.now() + env.ACCOUNT_LOCK_DURATION);
           user.failedLoginAttempts = 0;
         }
       }
@@ -95,14 +97,44 @@ export const authService = {
       userAgent,
       ipAddress,
       deviceId,
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      expiresAt: new Date(
+        Date.now() + env.REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
+      ),
     });
 
     return { accessToken, refreshToken };
   },
 
-  async logout(refreshToken: string) {
-    await AuthSession.deleteOne({ token: refreshToken });
+  async logout(dto: LogoutDto) {
+    const tokenFromDb = await AuthSession.findOne({
+      deviceId: dto.deviceId,
+      revokedAt: null,
+      expiresAt: { $gt: new Date() },
+    }).select("+tokenHash");
+
+    if (!tokenFromDb) {
+      logger.info(
+        `Logout attempt failed: Session for device ${dto.deviceId} not found or inactive.`,
+      );
+      return;
+    }
+
+    const isValid = await argon2.verify(
+      tokenFromDb.tokenHash,
+      dto.refreshToken,
+    );
+
+    if (!isValid) {
+      logger.warn(
+        `Logout failed for user ${tokenFromDb.user}: Token mismatch for device ${dto.deviceId}.`,
+      );
+      throw new AppError("Invalid credentials provided for logout.", 401);
+    }
+
+    await AuthSession.updateOne(
+      { _id: tokenFromDb._id },
+      { revokedAt: new Date(), revokedReason: "MANUAL_LOGOUT" },
+    );
   },
 
   async refresh(
@@ -163,12 +195,5 @@ export const authService = {
     );
 
     return newTokens;
-  },
-
-  async check() {
-    return argon2.verify(
-      "$argon2id$v=19$m=65536,t=3,p=4$PGiUkWYEoKYkCXzMDFfWMg$FBu//KPAy4ocVCV9rpMDFAHYM6nt4IEznMOEZIVUwWc",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTE1NmMzZjc5NTdlYjhlNzk2NGY1NmEiLCJpYXQiOjE3NjMwMTE2NDcsImV4cCI6MTc2NTYwMzY0Nywic3ViIjoiNjkxNTZjM2Y3OTU3ZWI4ZTc5NjRmNTZhIn0.Zjn9xViffUU6-eI-TIHFBZKsM8p7diCyJA9V1okXID4",
-    );
   },
 };

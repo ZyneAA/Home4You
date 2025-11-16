@@ -1,9 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
 
 import { authService } from "./auth.service.mjs";
-import type { AuthSessionDto } from "./dtos/auth.dto.mjs";
 import type { LoginDto } from "./dtos/login.dto.mjs";
+import type { LogoutDto } from "./dtos/logout.dto.mjs";
 import type { RefreshDto } from "./dtos/refresh.dto.mjs";
+import type { RegisterDto } from "./dtos/register.dto.mjs";
 
 function normalizeIp(ip: string | string[] | undefined): string {
   if (!ip) {
@@ -29,7 +30,7 @@ function cleanIp(ip: string): string {
 
 export const authController = {
   async register(
-    req: Request<unknown, unknown, AuthSessionDto>,
+    req: Request<unknown, unknown, RegisterDto>,
     res: Response,
     next: NextFunction,
   ) {
@@ -76,12 +77,13 @@ export const authController = {
     }
   },
 
-  async logout(req: Request, res: Response, next: NextFunction) {
+  async logout(
+    req: Request<unknown, unknown, LogoutDto>,
+    res: Response,
+    next: NextFunction,
+  ) {
     try {
-      const { refreshToken } = req.cookies;
-      if (refreshToken) {
-        await authService.logout(refreshToken);
-      }
+      await authService.logout(req.body);
       res.status(204).send();
     } catch (error) {
       next(error);
@@ -127,7 +129,6 @@ export const authController = {
   },
 
   async check(_req: Request, res: Response, _next: NextFunction) {
-    const ok = await authService.check();
-    res.status(200).json({ ok });
+    res.status(200).json({ auth: true });
   },
 };

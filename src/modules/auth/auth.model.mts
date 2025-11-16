@@ -12,12 +12,13 @@ const AuthSessionSchema = new Schema<IAuthSession>(
     tokenHash: {
       type: String,
       required: true,
+      select: false,
       index: true,
     },
     expiresAt: {
       type: Date,
       required: true,
-      index: true,
+      index: { expires: 0 },
     },
     revokedAt: {
       type: Date,
@@ -29,6 +30,7 @@ const AuthSessionSchema = new Schema<IAuthSession>(
     },
     userAgent: {
       type: String,
+      required: true,
     },
     ipAddress: {
       type: String,

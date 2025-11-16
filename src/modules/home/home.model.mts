@@ -29,7 +29,6 @@ const HomeSchema = new Schema(
 
     photo_urls: {
       type: [String],
-      validate: [(val: string[]) => val.length <= 20, "Too many photos"],
       default: [],
     },
 
