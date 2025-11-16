@@ -30,6 +30,19 @@ const envSchema = z.object({
   // JWT
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_REFRESH_SECRET: z.string().min(1, "JWT_SECRET is required"),
+
+  // Auth
+  FAILED_LOGIN_ATTEMPT: z.string().regex(/^\d+$/).transform(Number).default(10),
+  ACCOUNT_LOCK_DURATION: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .default(300000),
+  REFRESH_TOKEN_EXPIRY_DAYS: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .default(30),
 });
 
 const parseResult = envSchema.safeParse(process.env);
