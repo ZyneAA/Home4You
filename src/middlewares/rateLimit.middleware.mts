@@ -66,7 +66,7 @@ const ensureLuaScript = async (): Promise<string | null> => {
       } catch {
         try {
           await client.eval(LUA_SCRIPT);
-        } catch { }
+        } catch {}
       }
     }
   } catch (err) {
@@ -152,8 +152,8 @@ const rateLimiter = async (
   windowSize: number,
   subWindowSize: number,
   limit: number,
-  next: NextFunction
-) => {
+  next: NextFunction,
+): Promise<void> => {
   const now = Date.now();
 
   if (subWindowSize <= 0 || windowSize <= 0 || limit <= 0) {
@@ -202,8 +202,7 @@ export const globalRateLimit: RequestHandler = async (req, _, next) => {
   const LIMIT = Number(env.GLOBAL_LIMIT);
 
   await rateLimiter(key, WINDOW_SIZE, SUB_WINDOW_SIZE, LIMIT, next);
-
-}
+};
 
 export const authUserRateLimit: RequestHandler = async (req, _, next) => {
   if (!req.user) {
@@ -215,5 +214,4 @@ export const authUserRateLimit: RequestHandler = async (req, _, next) => {
   const LIMIT = Number(env.USER_LIMIT);
 
   await rateLimiter(key, WINDOW_SIZE, SUB_WINDOW_SIZE, LIMIT, next);
-
-}
+};

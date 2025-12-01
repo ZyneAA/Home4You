@@ -25,7 +25,11 @@ const envSchema = z.object({
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
   GLOBAL_LIMIT: z.string().regex(/^\d+$/).transform(Number).default(100),
   GLOBAL_WINDOW_SIZE: z.string().regex(/^\d+$/).transform(Number).default(15),
-  GLOBAL_SUB_WINDOW_SIZE: z.string().regex(/^\d+$/).transform(Number).default(5),
+  GLOBAL_SUB_WINDOW_SIZE: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .default(5),
 
   USER_LIMIT: z.string().regex(/^\d+$/).transform(Number).default(100),
   USER_WINDOW_SIZE: z.string().regex(/^\d+$/).transform(Number).default(15),
