@@ -4,6 +4,7 @@ import { Router } from "express";
 
 import { authController } from "./auth.controller.mjs";
 import { loginDtoSchema } from "./dtos/login.dto.mjs";
+import { logoutDtoSchema } from "./dtos/logout.dto.mjs";
 import { registerDtoSchema } from "./dtos/register.dto.mjs";
 
 const router = Router();
@@ -15,7 +16,7 @@ router.post(
 );
 router.get("/check", protect, authController.check);
 router.post("/login", validateDto(loginDtoSchema), authController.login);
-router.post("/logout", authController.logout);
+router.post("/logout", validateDto(logoutDtoSchema), authController.logout);
 router.post("/refresh", authController.refresh);
 
 export const authRoutes = router;

@@ -17,8 +17,6 @@ export interface IUser extends mongoose.Document {
   phone?: string;
   avatarUrl?: string;
   bio?: string;
-  createdAt: Date;
-  updatedAt: Date;
 
   isLocked(): boolean;
   setPassword(password: string): Promise<void>;

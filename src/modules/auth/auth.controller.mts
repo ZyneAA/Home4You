@@ -82,8 +82,20 @@ export const authController = {
     res: Response,
     next: NextFunction,
   ) {
+    let accessToken;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      accessToken = req.headers.authorization.split(" ")[1];
+    }
+    if (!accessToken) {
+      res.status(401).json({ message: "Access Token not found" });
+      return;
+    }
+
     try {
-      await authService.logout(req.body);
+      await authService.logout(req.body, accessToken);
       res.status(204).send();
     } catch (error) {
       next(error);
@@ -128,7 +140,7 @@ export const authController = {
     }
   },
 
-  async check(_req: Request, res: Response, _next: NextFunction) {
-    res.status(200).json({ auth: true });
+  async check(req: Request, res: Response, _next: NextFunction) {
+    res.status(200).json({ user: req.user });
   },
 };

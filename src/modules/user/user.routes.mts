@@ -6,8 +6,6 @@ import { userController } from "./user.controller.mjs";
 
 const router = Router();
 
-router.route("/").get(userController.getAllUsers);
-
 router
   .route("/:id")
   .get(userController.getUserById)
