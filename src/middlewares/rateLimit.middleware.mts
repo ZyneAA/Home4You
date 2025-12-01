@@ -1,7 +1,7 @@
 import { redisClient } from "@config";
 import { env } from "@shared/validations";
 import { logger, AppError } from "@utils";
-import type { RequestHandler } from "express";
+import type { NextFunction, RequestHandler } from "express";
 
 const LUA_SCRIPT = `
   local key = KEYS[1]
@@ -87,7 +87,6 @@ const ensureLuaScript = async (): Promise<string | null> => {
 async function runLua(key: string, args: string[]): Promise<[number, number]> {
   const client: any = redisClient;
 
-  // try evalsha if we have a sha
   if (luaSha) {
     try {
       if (typeof client.evalSha === "function") {
@@ -147,42 +146,36 @@ async function runLua(key: string, args: string[]): Promise<[number, number]> {
   throw new Error("Redis client does not support EVAL/EVALSHA on this runtime");
 }
 
-// --- Middleware ---
-export const rateLimit: RequestHandler = async (req, res, next) => {
-  const key = `rate_limit:${req.ip}`;
+// Ratelimiters
+const rateLimiter = async (
+  key: string,
+  windowSize: number,
+  subWindowSize: number,
+  limit: number,
+  next: NextFunction,
+): Promise<void> => {
   const now = Date.now();
-  const WINDOW_SIZE = Number(env.WINDOW_SIZE);
-  const SUB_WINDOW_SIZE = Number(env.SUB_WINDOW_SIZE);
-  const LIMIT = Number(env.LIMIT);
 
-  if (SUB_WINDOW_SIZE <= 0 || WINDOW_SIZE <= 0 || LIMIT <= 0) {
+  if (subWindowSize <= 0 || windowSize <= 0 || limit <= 0) {
     logger.warn("Rate limiter env invalid, skipping rate limit");
     return next();
   }
-  const subWindowSizeMs = SUB_WINDOW_SIZE * 1000;
+  const subWindowSizeMs = subWindowSize * 1000;
   const currentSubWindow = Math.floor(now / subWindowSizeMs);
   const validThreshold =
-    currentSubWindow - Math.floor(WINDOW_SIZE / SUB_WINDOW_SIZE);
+    currentSubWindow - Math.floor(windowSize / subWindowSize);
 
   try {
-    const [status, count] = await runLua(key, [
-      LIMIT.toString(),
+    const [status, _] = await runLua(key, [
+      limit.toString(),
       currentSubWindow.toString(),
       validThreshold.toString(),
-      WINDOW_SIZE.toString(),
+      windowSize.toString(),
     ]);
 
     const blocked = Number(status) === 1;
-    const currentCount = Number(count);
 
-    // Headers for rate limiting
-    res.setHeader("X-RateLimit-Limit", String(LIMIT));
-    res.setHeader(
-      "X-RateLimit-Remaining",
-      String(Math.max(0, LIMIT - currentCount)),
-    );
     if (blocked) {
-      res.setHeader("Retry-After", String(SUB_WINDOW_SIZE));
       return next(new AppError("Too many requests", 429));
     }
 
@@ -198,7 +191,27 @@ export const rateLimit: RequestHandler = async (req, res, next) => {
       logger.debug("Rate limiter Redis error suppressed (throttled)");
     }
 
-    res.setHeader("X-RateLimit-Bypass", "true");
     next();
   }
+};
+
+export const globalRateLimit: RequestHandler = async (req, _, next) => {
+  const key = `rate_limit:${req.ip}`;
+  const WINDOW_SIZE = Number(env.GLOBAL_WINDOW_SIZE);
+  const SUB_WINDOW_SIZE = Number(env.GLOBAL_SUB_WINDOW_SIZE);
+  const LIMIT = Number(env.GLOBAL_LIMIT);
+
+  await rateLimiter(key, WINDOW_SIZE, SUB_WINDOW_SIZE, LIMIT, next);
+};
+
+export const authUserRateLimit: RequestHandler = async (req, _, next) => {
+  if (!req.user) {
+    return next(new AppError("User not found", 404));
+  }
+  const key = `rate_limit:user:${req.user.id}`;
+  const WINDOW_SIZE = Number(env.USER_WINDOW_SIZE);
+  const SUB_WINDOW_SIZE = Number(env.USER_SUB_WINDOW_SIZE);
+  const LIMIT = Number(env.USER_LIMIT);
+
+  await rateLimiter(key, WINDOW_SIZE, SUB_WINDOW_SIZE, LIMIT, next);
 };

@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto";
+
 import { env } from "@shared/validations";
 import { logger, AppError } from "@utils";
 import jwt from "jsonwebtoken";
@@ -5,7 +7,8 @@ import jwt from "jsonwebtoken";
 export const jwtToken = {
   sign: (userId: string): string => {
     try {
-      return jwt.sign({ userId }, env.JWT_SECRET, {
+      const jti = randomUUID();
+      return jwt.sign({ userId, jti }, env.JWT_SECRET, {
         expiresIn: "10m",
         subject: userId,
       });

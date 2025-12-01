@@ -2,7 +2,7 @@ import { corsOptions } from "@config";
 import {
   globalErrorHandler,
   requestId,
-  rateLimit,
+  globalRateLimit,
   morganMiddleware,
 } from "@middlewares";
 import router from "@modules";
@@ -29,8 +29,8 @@ app.use(cookieParser());
 app.set("trust proxy", true);
 
 // Router and middlewares
-app.use(requestId, morganMiddleware, rateLimit);
-app.use("/api", router);
+app.use(requestId, morganMiddleware, globalRateLimit);
+app.use("/api/v1", router);
 app.use((req, _res, next) => {
   const err = new AppError(
     `Can't find the endpoint on the server ${req.originalUrl}`,

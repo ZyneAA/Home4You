@@ -1,3 +1,4 @@
+import { redisClient } from "@config";
 import { User } from "@modules/user";
 import { AppError, logger, jwtToken } from "@utils";
 import type { Request, Response, NextFunction, RequestHandler } from "express";
@@ -20,13 +21,26 @@ export const protect: RequestHandler = async (
   }
 
   try {
-    const { userId } = jwtToken.verify(token) as { userId: string };
+    const { userId, jti } = jwtToken.verify(token) as {
+      userId: string;
+      jti: string;
+    };
+    const isBlacklisted = await redisClient.get(jti);
+
+    if (isBlacklisted) {
+      logger.warn(`Revoked token access attempt with JTI: ${jti}`);
+      return next(
+        new AppError("Token has been revoked. Please log in again.", 401),
+      );
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       return next(new AppError("User not found", 401));
     }
 
     req.user = user;
+
     logger.info(user);
     next();
   } catch (error) {

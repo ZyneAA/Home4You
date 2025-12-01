@@ -1,5 +1,6 @@
 import crypto from "crypto";
 
+import { redisClient } from "@config";
 import { userService, User } from "@modules/user";
 import { env } from "@shared/validations";
 import { jwtToken, logger } from "@utils";
@@ -105,7 +106,18 @@ export const authService = {
     return { accessToken, refreshToken };
   },
 
-  async logout(dto: LogoutDto) {
+  async logout(dto: LogoutDto, accessToken: string) {
+    const { jti, exp } = jwtToken.verify(accessToken) as {
+      jti: string;
+      exp: number;
+    };
+    const ttlSeconds = Math.floor(exp - Date.now() / 1000);
+    if (ttlSeconds > 0) {
+      await redisClient.set(jti, "blacklisted_jti", {
+        expiration: { type: "EX", value: ttlSeconds },
+      });
+    }
+
     const tokenFromDb = await AuthSession.findOne({
       deviceId: dto.deviceId,
       revokedAt: null,
@@ -147,7 +159,9 @@ export const authService = {
       deviceId,
       revokedAt: null,
       expiresAt: { $gt: new Date() }, // Ensure token is active
-    }).lean();
+    })
+      .lean()
+      .select("+tokenHash");
 
     if (!tokenFromDb) {
       throw new AppError("Invalid or expired refresh token", 401);
