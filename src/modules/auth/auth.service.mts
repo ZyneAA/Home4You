@@ -13,6 +13,7 @@ import type { LogoutDto } from "./dtos/logout.dto.mjs";
 import type { RegisterDto } from "./dtos/register.dto.mjs";
 
 export const authService = {
+  //Register a new user and create session
   async register(
     dto: RegisterDto,
     ipAddress: string | unknown,
@@ -33,6 +34,7 @@ export const authService = {
     };
   },
 
+  //Login existing user and create session
   async login(dto: LoginDto, ipAddress: string | unknown, userAgent: string) {
     const user = await User.findOne({ email: dto.email }).select(
       "+passwordHash +lockUntil +failedLoginAttempts",
@@ -71,6 +73,7 @@ export const authService = {
     return this.createSession(user.id, ipAddress, userAgent, dto.deviceId);
   },
 
+  //Create a new auth session
   async createSession(
     userId: string,
     ipAddress: string | unknown,
@@ -106,6 +109,7 @@ export const authService = {
     return { accessToken, refreshToken };
   },
 
+  //Logout user by revoking the session
   async logout(dto: LogoutDto, accessToken: string) {
     const { jti, exp } = jwtToken.verify(accessToken) as {
       jti: string;
@@ -149,6 +153,7 @@ export const authService = {
     );
   },
 
+  //Refresh tokens
   async refresh(
     refreshToken: string,
     ipAddress: string,
