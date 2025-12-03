@@ -6,6 +6,8 @@ export interface IUser extends mongoose.Document {
   fullName: string;
   email: string;
   emailVerified: boolean;
+  otp?: string;
+  otpExpire?: Date;
   passwordHash?: string;
   verificationTokenHash?: string;
   verificationTokenExpires?: Date;
@@ -23,6 +25,7 @@ export interface IUser extends mongoose.Document {
   comparePassword(password: string): Promise<boolean>;
   generateVerificationToken(ttlMs?: number): Promise<string>;
   generatePasswordResetToken(ttlMs?: number): Promise<string>;
+  generateOtp(length: number): Promise<string>;
 }
 
 export function createTokenHash(): { token: string; hash: string } {
