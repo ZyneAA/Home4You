@@ -5,6 +5,8 @@ import type { LoginDto } from "./dtos/login.dto.mjs";
 import type { LogoutDto } from "./dtos/logout.dto.mjs";
 import type { RefreshDto } from "./dtos/refresh.dto.mjs";
 import type { RegisterDto } from "./dtos/register.dto.mjs";
+import type { SendOtpDto } from "./dtos/sendOtp.dto.mjs";
+import type { VerifyOtpDto } from "./dtos/verifyOtp.dto.mjs";
 
 function normalizeIp(ip: string | string[] | undefined): string {
   if (!ip) {
@@ -35,20 +37,10 @@ export const authController = {
     next: NextFunction,
   ) {
     try {
-      const rawIp = req.headers["x-forwarded-for"] || req.ip || undefined;
-      const ip = cleanIp(normalizeIp(rawIp));
-      const userAgent = req.headers["user-agent"] || "unknown";
-
-      const { user, accessToken, refreshToken } = await authService.register(
-        req.body,
-        ip,
-        userAgent,
-      );
+      const message = await authService.register(req.body);
 
       res.status(201).json({
-        message: "User created successfully",
-        user,
-        tokens: { accessToken, refreshToken },
+        message,
       });
     } catch (error) {
       next(error);
@@ -61,17 +53,9 @@ export const authController = {
     next: NextFunction,
   ) {
     try {
-      const rawIp = req.headers["x-forwarded-for"] || req.ip || undefined;
-      const ip = cleanIp(normalizeIp(rawIp));
-      const userAgent = req.headers["user-agent"] || "unknown";
+      const message = await authService.login(req.body);
 
-      const { accessToken, refreshToken } = await authService.login(
-        req.body,
-        ip,
-        userAgent,
-      );
-
-      res.status(200).json({ accessToken, refreshToken });
+      res.status(200).json({ message });
     } catch (error) {
       next(error);
     }
@@ -137,6 +121,49 @@ export const authController = {
       }
     } catch (error) {
       next(error);
+    }
+  },
+
+  async verifyOtp(
+    req: Request<unknown, unknown, VerifyOtpDto>,
+    res: Response,
+    next: NextFunction,
+  ) {
+    const rawIp = req.headers["x-forwarded-for"] || req.ip || undefined;
+    const ip = cleanIp(normalizeIp(rawIp));
+    const userAgent = req.headers["user-agent"] || "unknown";
+
+    try {
+      const { refreshToken, accessToken, user } = await authService.verifyOtp(
+        req.body.email,
+        req.body.otp,
+        ip,
+        userAgent,
+        req.body.deviceId,
+      );
+      res.status(200).json({
+        accessToken,
+        refreshToken,
+        user,
+      });
+    } catch (e) {
+      next(e);
+    }
+  },
+
+  async resendOtp(
+    req: Request<unknown, unknown, SendOtpDto>,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const otp = await authService.generateOtp(6);
+      await authService.updateOtp(req.body.email, otp);
+      await authService.sendOtp(req.body.email, otp);
+
+      res.status(200).json({ message: "OTP has been sent" });
+    } catch (e) {
+      next(e);
     }
   },
 

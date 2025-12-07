@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 import argon2 from "argon2";
 import { model, Schema } from "mongoose";
 import type { InferSchemaType } from "mongoose";
@@ -16,13 +18,19 @@ const UserSchema = new Schema<IUser>(
       lowercase: true,
       index: true,
     },
+
     emailVerified: { type: Boolean, default: false },
+    otp: { type: String, select: false },
+    otpExpire: { type: Date, select: false },
+
     passwordHash: { type: String, select: false },
     verificationTokenHash: { type: String, select: false },
     verificationTokenExpires: { type: Date, select: false },
+
     resetPasswordTokenHash: { type: String, select: false },
     resetPasswordTokenExpires: { type: Date, select: false },
     failedLoginAttempts: { type: Number, default: 0, select: false },
+
     lockUntil: { type: Date, select: false },
     roles: { type: [String], default: ["user"], index: true },
     phone: { type: String, trim: true, sparse: true },
@@ -31,13 +39,14 @@ const UserSchema = new Schema<IUser>(
   },
   {
     timestamps: true,
-    versionKey: "version",
     optimisticConcurrency: true,
     toJSON: {
       virtuals: true,
       transform(_doc, ret) {
         // remove sensitive/internal fields when serializing
         delete ret.passwordHash;
+        delete ret.otp;
+        delete ret.otpExpire;
         delete ret.verificationTokenHash;
         delete ret.verificationTokenExpires;
         delete ret.resetPasswordTokenHash;
@@ -116,6 +125,14 @@ UserSchema.methods["incrementFailedLogin"] = async function (
     this.lockUntil = new Date(Date.now() + lockMs);
   }
   await this.save();
+};
+
+UserSchema.methods["generateOtp"] = async function (length: number) {
+  return crypto
+    .randomBytes(length)
+    .toString("hex")
+    .slice(0, length)
+    .toUpperCase();
 };
 
 export type CreatedUser = InferSchemaType<typeof UserSchema>;

@@ -17,7 +17,9 @@ export const protect: RequestHandler = async (
   }
 
   if (!token) {
-    return next(new AppError("Not authorized to access this route", 401));
+    return next(
+      new AppError("No Token found! Not authorized to access this route", 401),
+    );
   }
 
   try {
@@ -25,18 +27,24 @@ export const protect: RequestHandler = async (
       userId: string;
       jti: string;
     };
-    const isBlacklisted = await redisClient.get(jti);
-
-    if (isBlacklisted) {
-      logger.warn(`Revoked token access attempt with JTI: ${jti}`);
-      return next(
-        new AppError("Token has been revoked. Please log in again.", 401),
-      );
+    try {
+      const isBlacklisted = await redisClient.get(jti);
+      if (isBlacklisted) {
+        logger.warn(`Revoked token access attempt with JTI: ${jti}`);
+        return next(
+          new AppError("Token has been revoked. Please log in again.", 401),
+        );
+      }
+    } catch (e) {
+      logger.error(e);
     }
 
     const user = await User.findById(userId);
     if (!user) {
       return next(new AppError("User not found", 401));
+    }
+    if (!user.emailVerified) {
+      return next(new AppError("Email is not verified", 401));
     }
 
     req.user = user;

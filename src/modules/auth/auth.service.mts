@@ -1,7 +1,8 @@
 import crypto from "crypto";
 
-import { redisClient } from "@config";
+import { redisClient, transporter } from "@config";
 import { userService, User } from "@modules/user";
+import type { IUser } from "@modules/user/types/user.type.mjs";
 import { env } from "@shared/validations";
 import { jwtToken, logger } from "@utils";
 import { AppError } from "@utils";
@@ -13,27 +14,16 @@ import type { LogoutDto } from "./dtos/logout.dto.mjs";
 import type { RegisterDto } from "./dtos/register.dto.mjs";
 
 export const authService = {
-  async register(
-    dto: RegisterDto,
-    ipAddress: string | unknown,
-    userAgent: string,
-  ) {
-    const user = await userService.createUser(dto);
-    const { accessToken, refreshToken } = await this.createSession(
-      user.id,
-      ipAddress,
-      userAgent,
-      dto.deviceId,
-    );
+  async register(dto: RegisterDto) {
+    await userService.createUser(dto);
+    const otp = await this.generateOtp(6);
+    await this.sendOtp(dto.email, otp);
+    await this.updateOtp(dto.email, otp);
 
-    return {
-      accessToken,
-      refreshToken,
-      user: user.toJSON(),
-    };
+    return "OTP has been sent to your email";
   },
 
-  async login(dto: LoginDto, ipAddress: string | unknown, userAgent: string) {
+  async login(dto: LoginDto) {
     const user = await User.findOne({ email: dto.email }).select(
       "+passwordHash +lockUntil +failedLoginAttempts",
     );
@@ -41,7 +31,6 @@ export const authService = {
       throw new AppError("Invalid credentials", 401);
     }
     if (user.lockUntil && user.lockUntil > new Date(Date.now())) {
-      // const remaining = Math.ceil((user.lockUntil - new Date(Date.now())) / 1000); // add later
       throw new AppError(`Account locked. Try again after sometime`, 423);
     }
 
@@ -55,20 +44,13 @@ export const authService = {
       dto.password,
     );
     if (!isPasswordValid) {
-      if (user.failedLoginAttempts !== undefined) {
-        user.failedLoginAttempts += 1;
-
-        if (user.failedLoginAttempts >= env.FAILED_LOGIN_ATTEMPT) {
-          user.lockUntil = new Date(Date.now() + env.ACCOUNT_LOCK_DURATION);
-          user.failedLoginAttempts = 0;
-        }
-      }
-
-      await user.save({ validateBeforeSave: false });
-      throw new AppError("Invalid credentials", 401);
+      return this.lockAccount(user, undefined);
     }
 
-    return this.createSession(user.id, ipAddress, userAgent, dto.deviceId);
+    const otp = await this.generateOtp(6);
+    await this.sendOtp(dto.email, otp);
+    await this.updateOtp(dto.email, otp);
+    return "OTP has been sent to your email";
   },
 
   async createSession(
@@ -111,7 +93,7 @@ export const authService = {
       jti: string;
       exp: number;
     };
-    const ttlSeconds = Math.floor(exp - Date.now() / 1000);
+    const ttlSeconds = Math.floor((exp - Date.now()) / 1000);
     if (ttlSeconds > 0) {
       await redisClient.set(jti, "blacklisted_jti", {
         expiration: { type: "EX", value: ttlSeconds },
@@ -147,6 +129,95 @@ export const authService = {
       { _id: tokenFromDb._id },
       { revokedAt: new Date(), revokedReason: "MANUAL_LOGOUT" },
     );
+  },
+
+  async generateOtp(length: number): Promise<string> {
+    if (length <= 0) {
+      throw new Error("Length must be a positive integer.");
+    }
+    const min = 10 ** (length - 1);
+    const max = 10 ** length;
+    const numericOtp = crypto.randomInt(min, max);
+
+    return numericOtp.toString();
+  },
+
+  async sendOtp(email: string, otp: string): Promise<void> {
+    await transporter.sendMail({
+      from: `"Home For You" <${env.SMTP_USER}>`,
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP is: ${otp}`,
+      html: `<p>Your OTP is: <b>${otp}</b></p>`,
+    });
+  },
+
+  async updateOtp(email: string, otp: string) {
+    const user = await User.findOne({
+      email,
+    }).select("+otp +otpExpire");
+    if (!user) {
+      throw new AppError("Invalid email", 404);
+    }
+
+    const expiary = env.OPT_EXPIARY;
+    user.otp = await argon2.hash(otp);
+    user.otpExpire = new Date(Date.now() + expiary);
+    await user.save();
+
+    return {
+      otp,
+      expiresAt: user.otpExpire,
+    };
+  },
+
+  async verifyOtp(
+    email: string,
+    otp: string,
+    ipAddress: string,
+    userAgent: string,
+    deviceId: string,
+  ) {
+    const user = await User.findOne({ email }).select("+otp +otpExpire");
+    if (!user) {
+      throw new AppError("Invalid email", 404);
+    }
+
+    if (user.lockUntil && user.lockUntil > new Date(Date.now())) {
+      throw new AppError(`Account locked. Try again after sometime`, 423);
+    }
+
+    if (!user.otp || !user.otpExpire) {
+      return this.lockAccount(user, "Expired Otp");
+    }
+
+    if (user.otpExpire.getTime() < Date.now()) {
+      return this.lockAccount(user, undefined);
+    }
+
+    const isValid = await argon2.verify(user.otp, otp);
+    if (!isValid) {
+      return this.lockAccount(user, undefined);
+    }
+
+    user.otp = undefined;
+    user.otpExpire = undefined;
+    user.emailVerified = true;
+
+    await user.save();
+
+    const { accessToken, refreshToken } = await this.createSession(
+      user.id,
+      ipAddress,
+      userAgent,
+      deviceId,
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+      user: user.toJSON(),
+    };
   },
 
   async refresh(
@@ -209,5 +280,19 @@ export const authService = {
     );
 
     return newTokens;
+  },
+
+  async lockAccount(user: IUser, message: string | undefined) {
+    if (user.failedLoginAttempts !== undefined) {
+      user.failedLoginAttempts += 1;
+
+      if (user.failedLoginAttempts >= env.FAILED_LOGIN_ATTEMPT) {
+        user.lockUntil = new Date(Date.now() + env.ACCOUNT_LOCK_DURATION);
+        user.failedLoginAttempts = 0;
+      }
+    }
+
+    await user.save({ validateBeforeSave: false });
+    throw new AppError(message || "Invalid credentials", 401);
   },
 };
