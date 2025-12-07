@@ -1,9 +1,5 @@
 import { corsOptions } from "@config";
-import {
-  globalErrorHandler,
-  requestId,
-  morganMiddleware,
-} from "@middlewares";
+import { globalErrorHandler, requestId, morganMiddleware } from "@middlewares";
 import router from "@modules";
 import { AppError } from "@utils";
 import compression from "compression";

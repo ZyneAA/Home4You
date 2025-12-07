@@ -17,7 +17,9 @@ export const protect: RequestHandler = async (
   }
 
   if (!token) {
-    return next(new AppError("No Token found! Not authorized to access this route", 401));
+    return next(
+      new AppError("No Token found! Not authorized to access this route", 401),
+    );
   }
 
   try {

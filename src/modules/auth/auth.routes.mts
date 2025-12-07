@@ -1,13 +1,14 @@
 import { validateDto } from "@middlewares";
 import { protect } from "@middlewares";
 import { Router } from "express";
+
 import { authController } from "./auth.controller.mjs";
 import { loginDtoSchema } from "./dtos/login.dto.mjs";
 import { logoutDtoSchema } from "./dtos/logout.dto.mjs";
-import { registerDtoSchema } from "./dtos/register.dto.mjs";
-import { verifyOtpDtoSchema } from "./dtos/verifyOtp.dto.mjs";
-import { sendOtpDtoSchema } from "./dtos/sendOtp.dto.mjs";
 import { refreshDtoSchema } from "./dtos/refresh.dto.mjs";
+import { registerDtoSchema } from "./dtos/register.dto.mjs";
+import { sendOtpDtoSchema } from "./dtos/sendOtp.dto.mjs";
+import { verifyOtpDtoSchema } from "./dtos/verifyOtp.dto.mjs";
 
 const router = Router();
 

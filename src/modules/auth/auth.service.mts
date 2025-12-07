@@ -1,15 +1,17 @@
 import crypto from "crypto";
+
 import { redisClient, transporter } from "@config";
 import { userService, User } from "@modules/user";
+import type { IUser } from "@modules/user/types/user.type.mjs";
 import { env } from "@shared/validations";
 import { jwtToken, logger } from "@utils";
 import { AppError } from "@utils";
 import argon2 from "argon2";
+
 import { AuthSession } from "./auth.model.mjs";
 import type { LoginDto } from "./dtos/login.dto.mjs";
 import type { LogoutDto } from "./dtos/logout.dto.mjs";
 import type { RegisterDto } from "./dtos/register.dto.mjs";
-import type { IUser } from "@modules/user/types/user.type.mjs";
 
 export const authService = {
   async register(dto: RegisterDto) {
@@ -292,5 +294,5 @@ export const authService = {
 
     await user.save({ validateBeforeSave: false });
     throw new AppError(message || "Invalid credentials", 401);
-  }
+  },
 };

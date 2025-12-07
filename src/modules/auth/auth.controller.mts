@@ -1,11 +1,12 @@
 import type { Request, Response, NextFunction } from "express";
+
 import { authService } from "./auth.service.mjs";
 import type { LoginDto } from "./dtos/login.dto.mjs";
 import type { LogoutDto } from "./dtos/logout.dto.mjs";
 import type { RefreshDto } from "./dtos/refresh.dto.mjs";
 import type { RegisterDto } from "./dtos/register.dto.mjs";
-import type { VerifyOtpDto } from "./dtos/verifyOtp.dto.mjs";
 import type { SendOtpDto } from "./dtos/sendOtp.dto.mjs";
+import type { VerifyOtpDto } from "./dtos/verifyOtp.dto.mjs";
 
 function normalizeIp(ip: string | string[] | undefined): string {
   if (!ip) {
@@ -150,7 +151,11 @@ export const authController = {
     }
   },
 
-  async resendOtp(req: Request<unknown, unknown, SendOtpDto>, res: Response, next: NextFunction) {
+  async resendOtp(
+    req: Request<unknown, unknown, SendOtpDto>,
+    res: Response,
+    next: NextFunction,
+  ) {
     try {
       const otp = await authService.generateOtp(6);
       await authService.updateOtp(req.body.email, otp);
@@ -158,7 +163,7 @@ export const authController = {
 
       res.status(200).json({ message: "OTP has been sent" });
     } catch (e) {
-      next(e)
+      next(e);
     }
   },
 
