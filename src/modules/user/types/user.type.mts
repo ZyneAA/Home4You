@@ -6,8 +6,8 @@ export interface IUser extends mongoose.Document {
   fullName: string;
   email: string;
   emailVerified: boolean;
-  otp?: string;
-  otpExpire?: Date;
+  otp?: string | undefined;
+  otpExpire?: Date | undefined;
   passwordHash?: string;
   verificationTokenHash?: string;
   verificationTokenExpires?: Date;

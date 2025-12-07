@@ -51,6 +51,11 @@ const envSchema = z.object({
     .regex(/^\d+$/)
     .transform(Number)
     .default(30),
+  OPT_EXPIARY: z.string().regex(/^\d+$/).transform(Number).default(300000),
+  SMTP_HOST: z.string(),
+  SMTP_PORT: z.string().regex(/^\d+$/).default("2525").transform(Number),
+  SMTP_USER: z.string(),
+  SMTP_PASS: z.string(),
 });
 
 const parseResult = envSchema.safeParse(process.env);

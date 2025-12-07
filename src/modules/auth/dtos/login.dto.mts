@@ -6,7 +6,13 @@ const uuidRegex =
 export const loginDtoSchema = z.object({
   body: z.object({
     email: z.email(),
-    password: z.string(),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        "Password must include at least one capital letter, one special character, and one number",
+      ),
     deviceId: z
       .string()
       .min(1, "Device ID is required.")
