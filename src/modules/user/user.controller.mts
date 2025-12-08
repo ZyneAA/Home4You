@@ -1,6 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
 
-import type { CreateUserDto } from "./dtos/create-user.dto.mjs";
 import type {
   UpdateUserDto,
   UpdateUserParams,
@@ -8,19 +7,6 @@ import type {
 import { userService } from "./user.service.mjs";
 
 export const userController = {
-  async createUser(
-    req: Request<CreateUserDto>,
-    res: Response,
-    next: NextFunction,
-  ) {
-    try {
-      const user = await userService.createUser(req.body);
-      res.status(201).json(user.toJSON());
-    } catch (error) {
-      next(error);
-    }
-  },
-
   async getAllUsers(_req: Request, res: Response, next: NextFunction) {
     try {
       const users = await userService.getAllUsers();
