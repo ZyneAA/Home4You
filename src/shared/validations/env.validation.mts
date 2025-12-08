@@ -52,6 +52,11 @@ const envSchema = z.object({
     .transform(Number)
     .default(30),
   OPT_EXPIARY: z.string().regex(/^\d+$/).transform(Number).default(300000),
+  OTP_RESEND_WINDOW_SECONDS: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .default(60),
   SMTP_HOST: z.string(),
   SMTP_PORT: z.string().regex(/^\d+$/).default("2525").transform(Number),
   SMTP_USER: z.string(),
