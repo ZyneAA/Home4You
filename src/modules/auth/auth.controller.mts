@@ -157,10 +157,7 @@ export const authController = {
     next: NextFunction,
   ) {
     try {
-      const otp = await authService.generateOtp(6);
-      await authService.updateOtp(req.body.email, otp);
-      await authService.sendOtp(req.body.email, otp);
-
+      await authService.resendOtp(req.body.email);
       res.status(200).json({ message: "OTP has been sent" });
     } catch (e) {
       next(e);
