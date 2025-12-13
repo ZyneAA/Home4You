@@ -111,7 +111,7 @@ export const authService = {
       deviceId,
     }).session(session);
     await AuthSession.create(
-      {
+      [{
         user: userId,
         tokenHash,
         userAgent,
@@ -120,7 +120,7 @@ export const authService = {
         expiresAt: new Date(
           Date.now() + env.REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
         ),
-      },
+      }],
       { session },
     );
 

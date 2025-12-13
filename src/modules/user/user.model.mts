@@ -40,6 +40,7 @@ const UserSchema = new Schema<IUser>(
   {
     timestamps: true,
     optimisticConcurrency: true,
+    collection: 'users',
     toJSON: {
       virtuals: true,
       transform(_doc, ret) {
@@ -60,7 +61,7 @@ const UserSchema = new Schema<IUser>(
   },
 );
 
-UserSchema.methods["setPassword"] = async function (
+UserSchema.methods["setPassword"] = async function(
   this: IUser,
   password: string,
 ): Promise<void> {
@@ -72,7 +73,7 @@ UserSchema.methods["setPassword"] = async function (
   this.lockUntil = null;
 };
 
-UserSchema.methods["comparePassword"] = async function (
+UserSchema.methods["comparePassword"] = async function(
   this: IUser,
   candidate: string,
 ): Promise<boolean> {
@@ -86,7 +87,7 @@ UserSchema.methods["comparePassword"] = async function (
   }
 };
 
-UserSchema.methods["generateVerificationToken"] = async function (
+UserSchema.methods["generateVerificationToken"] = async function(
   this: IUser,
   ttlMs = 24 * 60 * 60 * 1000,
 ): Promise<string> {
@@ -97,7 +98,7 @@ UserSchema.methods["generateVerificationToken"] = async function (
   return token;
 };
 
-UserSchema.methods["generatePasswordResetToken"] = async function (
+UserSchema.methods["generatePasswordResetToken"] = async function(
   this: IUser,
   ttlMs = 60 * 60 * 1000,
 ) {
@@ -108,11 +109,11 @@ UserSchema.methods["generatePasswordResetToken"] = async function (
   return token;
 };
 
-UserSchema.methods["isLocked"] = function (this: IUser) {
+UserSchema.methods["isLocked"] = function(this: IUser) {
   return !!(this.lockUntil && this.lockUntil.getTime() > Date.now());
 };
 
-UserSchema.methods["incrementFailedLogin"] = async function (
+UserSchema.methods["incrementFailedLogin"] = async function(
   this: IUser,
   maxAttempts = 5,
   lockMs = 15 * 60 * 1000,
@@ -127,7 +128,7 @@ UserSchema.methods["incrementFailedLogin"] = async function (
   await this.save();
 };
 
-UserSchema.methods["generateOtp"] = async function (length: number) {
+UserSchema.methods["generateOtp"] = async function(length: number) {
   return crypto
     .randomBytes(length)
     .toString("hex")
