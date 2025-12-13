@@ -1,11 +1,11 @@
 import { AppError } from "@utils";
 import type { ClientSession } from "mongoose";
+import mongoose from "mongoose";
 
 import type { CreateUserDto } from "./dtos/create-user.dto.mjs";
 import type { UpdateUserDto } from "./dtos/update-user.dto.mjs";
 import type { IUser } from "./types/user.type.mjs";
 import { User } from "./user.model.mjs";
-import mongoose from "mongoose";
 
 export const userService = {
   async createUser(
@@ -27,7 +27,6 @@ export const userService = {
       },
       { session },
     );
-    console.log(newUser);
 
     await newUser.setPassword(userData.password);
 

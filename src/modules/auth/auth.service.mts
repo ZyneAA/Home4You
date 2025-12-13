@@ -111,16 +111,18 @@ export const authService = {
       deviceId,
     }).session(session);
     await AuthSession.create(
-      [{
-        user: userId,
-        tokenHash,
-        userAgent,
-        ipAddress,
-        deviceId,
-        expiresAt: new Date(
-          Date.now() + env.REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
-        ),
-      }],
+      [
+        {
+          user: userId,
+          tokenHash,
+          userAgent,
+          ipAddress,
+          deviceId,
+          expiresAt: new Date(
+            Date.now() + env.REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
+          ),
+        },
+      ],
       { session },
     );
 
