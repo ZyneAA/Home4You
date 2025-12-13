@@ -3,10 +3,9 @@ import { logger } from "@utils";
 import mongoose from "mongoose";
 
 export const connectDB = async (): Promise<void> => {
-  const DATABASE_URL = env.DATABASE_URL;
-
   try {
-    const connect = await mongoose.connect(DATABASE_URL, {
+    const connect = await mongoose.connect(env.DATABASE_URL, {
+      replicaSet: env.DATABASE_REPLICA_SET,
       maxPoolSize: env.NODE_ENV === "production" ? env.MONGO_MAX_POOL_SIZE : 10,
       minPoolSize: env.NODE_ENV === "production" ? env.MONGO_MIN_POOL_SIZE : 2,
       maxIdleTimeMS: 30000,

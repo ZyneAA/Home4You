@@ -18,6 +18,7 @@ const envSchema = z.object({
 
   // DB related
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+  DATABASE_REPLICA_SET: z.string().min(1, "Database replica set is required"),
   MONGO_MAX_POOL_SIZE: z.string().regex(/^\d+$/).transform(Number).default(10),
   MONGO_MIN_POOL_SIZE: z.string().regex(/^\d+$/).transform(Number).default(2),
 

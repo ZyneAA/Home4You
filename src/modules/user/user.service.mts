@@ -1,5 +1,6 @@
 import { AppError } from "@utils";
 import type { ClientSession } from "mongoose";
+import mongoose from "mongoose";
 
 import type { CreateUserDto } from "./dtos/create-user.dto.mjs";
 import type { UpdateUserDto } from "./dtos/update-user.dto.mjs";
@@ -20,7 +21,9 @@ export const userService = {
 
     const newUser = new User(
       {
-        ...userData,
+        _id: new mongoose.Types.ObjectId(),
+        fullName: userData.fullName,
+        email: userData.email,
       },
       { session },
     );

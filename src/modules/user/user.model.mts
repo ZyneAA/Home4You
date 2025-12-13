@@ -40,6 +40,7 @@ const UserSchema = new Schema<IUser>(
   {
     timestamps: true,
     optimisticConcurrency: true,
+    collection: "users",
     toJSON: {
       virtuals: true,
       transform(_doc, ret) {
