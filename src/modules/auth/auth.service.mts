@@ -417,6 +417,22 @@ export const authService = {
     }
   },
 
+  // async forgotPassword(email: string) {
+  //   try {
+  //     const user = User.findOne({ email });
+  //     if (!user) {
+
+  //     }
+
+  //   } catch (e) {
+
+  //   }
+  // },
+
+  // async resetPasswrod(otp: string, email: string) {
+
+  // },
+
   async lockAccount(user: IUser, session: ClientSession) {
     if (user.failedLoginAttempts !== undefined) {
       user.failedLoginAttempts += 1;

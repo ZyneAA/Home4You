@@ -29,13 +29,12 @@ const UserSchema = new Schema<IUser>(
 
     resetPasswordTokenHash: { type: String, select: false },
     resetPasswordTokenExpires: { type: Date, select: false },
+
     failedLoginAttempts: { type: Number, default: 0, select: false },
 
     lockUntil: { type: Date, select: false },
     roles: { type: [String], default: ["user"], index: true },
     phone: { type: String, trim: true, sparse: true },
-    avatarUrl: { type: String, trim: true },
-    bio: { type: String, trim: true, maxlength: 1024 },
   },
   {
     timestamps: true,
