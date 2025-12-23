@@ -68,11 +68,7 @@ export const otpCodeService = {
     }
   },
 
-  async createAndSetOtp(
-    userId: string,
-    otp: string,
-    session: ClientSession
-  ) {
+  async createAndSetOtp(userId: string, otp: string, session: ClientSession) {
     await OtpCode.deleteMany({ userId }, { session });
 
     const expiryOffset = env.OPT_EXPIARY;
@@ -80,17 +76,19 @@ export const otpCodeService = {
     const expiresAt = new Date(Date.now() + expiryOffset);
 
     await OtpCode.create(
-      [{
-        userId,
-        codeHash,
-        expiresAt
-      }],
-      { session }
+      [
+        {
+          userId,
+          codeHash,
+          expiresAt,
+        },
+      ],
+      { session },
     );
 
     return {
       otp,
-      expiresAt
+      expiresAt,
     };
   },
 

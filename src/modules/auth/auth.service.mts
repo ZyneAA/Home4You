@@ -1,9 +1,9 @@
 import crypto from "crypto";
 
 import { redisClient } from "@config";
+import { otpCodeService } from "@modules/otp-code/otpCode.service.mjs";
 import { userService, User } from "@modules/user/index.mjs";
 import type { IUser } from "@modules/user/types/user.type.mjs";
-import { otpCodeService } from "@modules/otp-code/otpCode.service.mjs";
 import { env } from "@shared/validations";
 import { jwtToken, logger } from "@utils";
 import { AppError } from "@utils";
@@ -75,7 +75,6 @@ export const authService = {
         otp = await otpCodeService.generateOtp(6);
         await otpCodeService.createAndSetOtp(user.id, otp, session);
         await session.commitTransaction();
-
       });
 
       await otpCodeService.sendOtp(dto.email, otp!);
@@ -201,7 +200,10 @@ export const authService = {
 
         const userId = tokenFromDb.userId.toString();
 
-        const isValid = await argon2.verify(tokenFromDb.tokenHash, refreshToken);
+        const isValid = await argon2.verify(
+          tokenFromDb.tokenHash,
+          refreshToken,
+        );
         if (!isValid) {
           await AuthSession.updateMany(
             { user: userId },
