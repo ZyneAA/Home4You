@@ -1,13 +1,14 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, model } from "mongoose";
 
-const OtpCodeSchema = new Schema(
+import type { IOtpCode } from "./types/otpCode.type.mjs";
+
+const OtpCodeSchema = new Schema<IOtpCode>(
   {
-    userId: { type: Types.ObjectId, ref: "User", index: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", index: true },
 
-    // Optional link to a pending session if you're doing multi-step login
-    authSessionId: { type: Types.ObjectId, ref: "AuthSession" },
+    authSessionId: { type: Schema.Types.ObjectId, ref: "AuthSession" },
 
-    codeHash: { type: String, required: true },
+    codeHash: { type: String, required: true, select: false },
 
     type: {
       type: String,
@@ -21,7 +22,7 @@ const OtpCodeSchema = new Schema(
       enum: ["SMS", "EMAIL"],
     },
 
-    expiresAt: { type: Date, index: true },
+    expiresAt: { type: Date, index: true, select: false },
 
     usedAt: { type: Date },
     failedAttempts: { type: Number, default: 0 },

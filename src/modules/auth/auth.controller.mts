@@ -7,6 +7,7 @@ import type { RefreshDto } from "./dtos/refresh.dto.mjs";
 import type { RegisterDto } from "./dtos/register.dto.mjs";
 import type { SendOtpDto } from "./dtos/sendOtp.dto.mjs";
 import type { VerifyOtpDto } from "./dtos/verifyOtp.dto.mjs";
+import { otpCodeService } from "@modules/otp-code/otpCode.service.mjs";
 
 function normalizeIp(ip: string | string[] | undefined): string {
   if (!ip) {
@@ -134,7 +135,7 @@ export const authController = {
     const userAgent = req.headers["user-agent"] || "unknown";
 
     try {
-      const { refreshToken, accessToken, user } = await authService.verifyOtp(
+      const { refreshToken, accessToken, user } = await otpCodeService.verifyOtp(
         req.body.email,
         req.body.otp,
         ip,
@@ -157,7 +158,7 @@ export const authController = {
     next: NextFunction,
   ) {
     try {
-      await authService.resendOtp(req.body.email);
+      await otpCodeService.resendOtp(req.body.email);
       res.status(200).json({ message: "OTP has been sent" });
     } catch (e) {
       next(e);
