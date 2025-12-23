@@ -23,6 +23,8 @@ const envSchema = z.object({
   MONGO_MIN_POOL_SIZE: z.string().regex(/^\d+$/).transform(Number).default(2),
 
   // Redis related
+
+  // Rate limiting
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
   GLOBAL_LIMIT: z.string().regex(/^\d+$/).transform(Number).default(100),
   GLOBAL_WINDOW_SIZE: z.string().regex(/^\d+$/).transform(Number).default(15),

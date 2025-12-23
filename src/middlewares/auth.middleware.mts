@@ -1,5 +1,5 @@
 import { redisClient } from "@config";
-import { User } from "@modules/user";
+import { User } from "@modules/user/user.model.mjs";
 import { AppError, logger, jwtToken } from "@utils";
 import type { Request, Response, NextFunction, RequestHandler } from "express";
 

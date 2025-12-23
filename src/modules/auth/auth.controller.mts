@@ -1,3 +1,4 @@
+import { otpCodeService } from "@modules/otp-code/otpCode.service.mjs";
 import type { Request, Response, NextFunction } from "express";
 
 import { authService } from "./auth.service.mjs";
@@ -134,13 +135,14 @@ export const authController = {
     const userAgent = req.headers["user-agent"] || "unknown";
 
     try {
-      const { refreshToken, accessToken, user } = await authService.verifyOtp(
-        req.body.email,
-        req.body.otp,
-        ip,
-        userAgent,
-        req.body.deviceId,
-      );
+      const { refreshToken, accessToken, user } =
+        await otpCodeService.verifyOtp(
+          req.body.email,
+          req.body.otp,
+          ip,
+          userAgent,
+          req.body.deviceId,
+        );
       res.status(200).json({
         accessToken,
         refreshToken,
@@ -157,7 +159,7 @@ export const authController = {
     next: NextFunction,
   ) {
     try {
-      await authService.resendOtp(req.body.email);
+      await otpCodeService.resendOtp(req.body.email);
       res.status(200).json({ message: "OTP has been sent" });
     } catch (e) {
       next(e);

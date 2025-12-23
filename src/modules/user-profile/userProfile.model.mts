@@ -1,8 +1,10 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, model } from "mongoose";
 
-const UserProfileSchema = new Schema(
+import type { IUserProfile } from "./types/userProfile.types.mjs";
+
+const UserProfileSchema = new Schema<IUserProfile>(
   {
-    userId: { type: Types.ObjectId, ref: "User", unique: true, index: true },
+    userId: { type: Schema.ObjectId, ref: "User", unique: true, index: true },
 
     fullName: { type: String },
     bio: { type: String },
@@ -10,7 +12,6 @@ const UserProfileSchema = new Schema(
 
     location: {
       city: String,
-      country: String,
     },
   },
   { timestamps: true },

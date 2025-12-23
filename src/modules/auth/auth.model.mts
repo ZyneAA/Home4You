@@ -4,10 +4,11 @@ import type { IAuthSession } from "./types/authSession.type.mjs";
 
 const AuthSessionSchema = new Schema<IAuthSession>(
   {
-    user: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     tokenHash: {
       type: String,
