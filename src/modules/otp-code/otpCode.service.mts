@@ -9,6 +9,9 @@ import { AppError, logger } from "@utils";
 import argon2 from "argon2";
 import mongoose, { type ClientSession } from "mongoose";
 
+import type { Channel } from "./types/channel.type.mjs";
+import type { OtpType } from "./types/otpType.type.mjs";
+
 export const otpCodeService = {
   async generateOtp(length: number): Promise<string> {
     if (length <= 0) {
@@ -31,7 +34,11 @@ export const otpCodeService = {
     });
   },
 
-  async resendOtp(email: string): Promise<string> {
+  async resendOtp(
+    email: string,
+    type: OtpType,
+    channel: Channel,
+  ): Promise<string> {
     const session = await mongoose.startSession();
 
     try {
@@ -50,7 +57,7 @@ export const otpCodeService = {
         throw new AppError("User not found or database error", 500);
       }
       const otp = await this.generateOtp(6);
-      await this.createAndSetOtp(user.id, otp, session);
+      await this.createAndSetOtp(user.id, otp, type, channel, session);
       await this.sendOtp(email, otp);
       await session.commitTransaction();
 
@@ -68,8 +75,14 @@ export const otpCodeService = {
     }
   },
 
-  async createAndSetOtp(userId: string, otp: string, session: ClientSession) {
-    await OtpCode.deleteMany({ userId }, { session });
+  async createAndSetOtp(
+    userId: string,
+    otp: string,
+    type: OtpType,
+    channel: Channel,
+    session: ClientSession,
+  ): Promise<{ otp: string; expiresAt: Date }> {
+    await OtpCode.deleteMany({ userId, type }, { session });
 
     const expiryOffset = env.OPT_EXPIARY;
     const codeHash = await argon2.hash(otp);
@@ -81,6 +94,8 @@ export const otpCodeService = {
           userId,
           codeHash,
           expiresAt,
+          type,
+          channel,
         },
       ],
       { session },
@@ -92,15 +107,22 @@ export const otpCodeService = {
     };
   },
 
-  async otpOperation(userId: string, email: string, session: ClientSession) {
+  async otpOperation(
+    userId: string,
+    email: string,
+    type: OtpType,
+    channel: Channel,
+    session: ClientSession,
+  ) {
     const otp = await this.generateOtp(6);
     await this.sendOtp(email, otp);
-    await this.createAndSetOtp(userId, otp, session);
+    await this.createAndSetOtp(userId, otp, type, channel, session);
   },
 
   async verifyOtp(
     email: string,
     otp: string,
+    type: OtpType,
     ipAddress: string,
     userAgent: string,
     deviceId: string,
@@ -110,30 +132,34 @@ export const otpCodeService = {
     try {
       session.startTransaction();
 
-      const user = await User.findOne({ email })
-        .select("+otp +otpExpire")
-        .session(session);
+      const user = await User.findOne({ email }).session(session);
       if (!user) {
         throw new AppError("Invalid email", 404);
       }
-
       if (user.lockUntil && user.lockUntil > new Date(Date.now())) {
         throw new AppError(`Account locked. Try again after sometime`, 423);
       }
 
-      if (!user.otp || !user.otpExpire) {
+      const otpCode = await OtpCode.findOne({ userId: user.id, type })
+        .select("+codeHash +expiresAt")
+        .session(session);
+      if (!otpCode) {
+        throw new AppError("Invalid email", 404);
+      }
+
+      if (otpCode.expiresAt < new Date()) {
+        await OtpCode.deleteOne({ _id: otpCode._id }, { session });
+        throw new AppError("Code expired", 401);
+      }
+
+      if (!otpCode.codeHash || !otpCode.expiresAt) {
         await authService.lockAccount(user, session);
         await session.commitTransaction();
+
         throw new AppError("Invalid credentials", 401);
       }
 
-      let isOtpValid = false;
-      if (user.otp && user.otpExpire) {
-        if (user.otpExpire.getTime() >= Date.now()) {
-          isOtpValid = await argon2.verify(user.otp, otp);
-        }
-      }
-
+      const isOtpValid = await argon2.verify(otpCode.codeHash, otp);
       if (!isOtpValid) {
         await authService.lockAccount(user, session);
         await session.commitTransaction();
@@ -141,12 +167,12 @@ export const otpCodeService = {
         throw new AppError("Invalid credentials", 401);
       }
 
-      user.otp = undefined;
-      user.otpExpire = undefined;
       user.emailVerified = true;
       user.failedLoginAttempts = 0;
-
+      user.lockUntil = null;
       await user.save({ session });
+
+      await OtpCode.deleteOne({ _id: otpCode._id }, { session });
 
       const { accessToken, refreshToken } = await authService.createSession(
         user.id,

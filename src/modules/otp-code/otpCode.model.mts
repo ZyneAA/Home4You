@@ -12,13 +12,14 @@ const OtpCodeSchema = new Schema<IOtpCode>(
 
     type: {
       type: String,
-      enum: ["LOGIN", "SIGNUP", "PASSWORD_RESET", "PHONE_VERIFY"],
+      enum: ["LOGIN", "SIGNUP", "PASSWORD_RESET", "ACC_VERIFY"],
       required: true,
       index: true,
     },
 
     channel: {
       type: String,
+      required: true,
       enum: ["SMS", "EMAIL"],
     },
 
@@ -32,7 +33,5 @@ const OtpCodeSchema = new Schema<IOtpCode>(
   },
   { timestamps: true },
 );
-
-OtpCodeSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export const OtpCode = model("OtpCode", OtpCodeSchema);

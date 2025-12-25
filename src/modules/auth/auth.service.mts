@@ -2,6 +2,8 @@ import crypto from "crypto";
 
 import { redisClient } from "@config";
 import { otpCodeService } from "@modules/otp-code/otpCode.service.mjs";
+import { Channel } from "@modules/otp-code/types/channel.type.mjs";
+import { OtpType } from "@modules/otp-code/types/otpType.type.mjs";
 import { userService, User } from "@modules/user/index.mjs";
 import type { IUser } from "@modules/user/types/user.type.mjs";
 import { env } from "@shared/validations";
@@ -22,12 +24,25 @@ export const authService = {
 
     try {
       await session.withTransaction(async () => {
-        const newUser = await userService.createUser(dto, session);
-        otp = await otpCodeService.generateOtp(6);
-        await otpCodeService.createAndSetOtp(newUser.id, otp, session);
+        if (dto.channel === Channel.EMAIL) {
+          const newUser = await userService.createUser(dto, session);
+          otp = await otpCodeService.generateOtp(6);
+          await otpCodeService.createAndSetOtp(
+            newUser.id,
+            otp,
+            OtpType.SIGNUP,
+            Channel.EMAIL,
+            session,
+          );
+        } else {
+          // impl registration with ph number
+        }
       });
-
-      await otpCodeService.sendOtp(dto.email, otp!);
+      if (dto.channel === Channel.EMAIL) {
+        await otpCodeService.sendOtp(dto.email, otp!);
+      } else {
+        // send otp with ph number
+      }
 
       return "OTP has been sent to your email";
     } catch (e) {
@@ -68,13 +83,17 @@ export const authService = {
 
         if (!isPasswordValid) {
           await this.lockAccount(user, session);
-          await session.commitTransaction();
           throw new AppError("Invalid credentials", 401);
         }
 
         otp = await otpCodeService.generateOtp(6);
-        await otpCodeService.createAndSetOtp(user.id, otp, session);
-        await session.commitTransaction();
+        await otpCodeService.createAndSetOtp(
+          user.id,
+          otp,
+          OtpType.LOGIN,
+          Channel.EMAIL,
+          session,
+        );
       });
 
       await otpCodeService.sendOtp(dto.email, otp!);
@@ -115,7 +134,7 @@ export const authService = {
     await AuthSession.create(
       [
         {
-          user: userId,
+          userId,
           tokenHash,
           userAgent,
           ipAddress,
