@@ -24,7 +24,7 @@ export const authService = {
 
     try {
       await session.withTransaction(async () => {
-        if (dto.channel == Channel.EMAIL) {
+        if (dto.channel === Channel.EMAIL) {
           const newUser = await userService.createUser(dto, session);
           otp = await otpCodeService.generateOtp(6);
           await otpCodeService.createAndSetOtp(
@@ -38,7 +38,7 @@ export const authService = {
           // impl registration with ph number
         }
       });
-      if (dto.channel == Channel.EMAIL) {
+      if (dto.channel === Channel.EMAIL) {
         await otpCodeService.sendOtp(dto.email, otp!);
       } else {
         // send otp with ph number
