@@ -18,9 +18,14 @@ router.post(
   authController.register,
 );
 router.post(
-  "/verify-otp",
+  "/verify-login-otp",
   validateDto(verifyOtpDtoSchema),
-  authController.verifyOtp,
+  authController.verifyOtpLogin,
+);
+router.post(
+  "/verify-signup-otp",
+  validateDto(verifyOtpDtoSchema),
+  authController.verifyOtpSignUp,
 );
 router.post(
   "/send-otp",

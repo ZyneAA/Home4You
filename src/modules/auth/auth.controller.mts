@@ -1,4 +1,5 @@
 import { otpCodeService } from "@modules/otp-code/otpCode.service.mjs";
+import { OtpType } from "@modules/otp-code/types/otpType.type.mjs";
 import type { Request, Response, NextFunction } from "express";
 
 import { authService } from "./auth.service.mjs";
@@ -128,6 +129,7 @@ export const authController = {
   async verifyOtp(
     req: Request<unknown, unknown, VerifyOtpDto>,
     res: Response,
+    type: OtpType,
     next: NextFunction,
   ) {
     const rawIp = req.headers["x-forwarded-for"] || req.ip || undefined;
@@ -139,6 +141,7 @@ export const authController = {
         await otpCodeService.verifyOtp(
           req.body.email,
           req.body.otp,
+          type,
           ip,
           userAgent,
           req.body.deviceId,
@@ -153,13 +156,33 @@ export const authController = {
     }
   },
 
+  async verifyOtpSignUp(
+    req: Request<unknown, unknown, VerifyOtpDto>,
+    res: Response,
+    next: NextFunction,
+  ) {
+    await authController.verifyOtp(req, res, OtpType.SIGNUP, next);
+  },
+
+  async verifyOtpLogin(
+    req: Request<unknown, unknown, VerifyOtpDto>,
+    res: Response,
+    next: NextFunction,
+  ) {
+    await authController.verifyOtp(req, res, OtpType.LOGIN, next);
+  },
+
   async resendOtp(
     req: Request<unknown, unknown, SendOtpDto>,
     res: Response,
     next: NextFunction,
   ) {
     try {
-      await otpCodeService.resendOtp(req.body.email);
+      await otpCodeService.resendOtp(
+        req.body.email,
+        req.body.type,
+        req.body.channel,
+      );
       res.status(200).json({ message: "OTP has been sent" });
     } catch (e) {
       next(e);
