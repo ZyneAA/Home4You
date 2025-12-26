@@ -20,8 +20,6 @@ const UserSchema = new Schema<IUser>(
     },
 
     emailVerified: { type: Boolean, default: false },
-    otp: { type: String, select: false },
-    otpExpire: { type: Date, select: false },
 
     passwordHash: { type: String, select: false },
     verificationTokenHash: { type: String, select: false },

@@ -13,7 +13,7 @@
     "fmt:check": "prettier --check .",
     "test": "vitest --coverage",
     "test:cov": "vitest run --coverage",
-    "prepare": "husky"
+    "prepare": "if [ \"$NODE_ENV\" != \"production\" ]; then husky; fi"
   },
   "author": "",
   "license": "ISC",
