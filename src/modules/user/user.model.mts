@@ -1,5 +1,3 @@
-import crypto from "crypto";
-
 import argon2 from "argon2";
 import { model, Schema } from "mongoose";
 import type { InferSchemaType } from "mongoose";
@@ -123,14 +121,6 @@ UserSchema.methods["incrementFailedLogin"] = async function (
     this.lockUntil = new Date(Date.now() + lockMs);
   }
   await this.save();
-};
-
-UserSchema.methods["generateOtp"] = async function (length: number) {
-  return crypto
-    .randomBytes(length)
-    .toString("hex")
-    .slice(0, length)
-    .toUpperCase();
 };
 
 export type CreatedUser = InferSchemaType<typeof UserSchema>;

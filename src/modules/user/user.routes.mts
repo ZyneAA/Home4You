@@ -1,4 +1,4 @@
-import { validateDto } from "@middlewares";
+import { protect, validateDto } from "@middlewares";
 import { Router } from "express";
 
 import { updateUserDtoSchema } from "./dtos/update-user.dto.mjs";
@@ -8,8 +8,8 @@ const router = Router();
 
 router
   .route("/:id")
-  .get(userController.getUserById)
-  .patch(validateDto(updateUserDtoSchema), userController.updateUser)
-  .delete(userController.deleteUser);
+  .get(protect, userController.getUserById)
+  .patch(protect, validateDto(updateUserDtoSchema), userController.updateUser)
+  .delete(protect, userController.deleteUser);
 
 export const userRoutes = router;

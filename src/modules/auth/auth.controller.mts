@@ -76,7 +76,7 @@ export const authController = {
       accessToken = req.headers.authorization.split(" ")[1];
     }
     if (!accessToken) {
-      res.status(401).json({ message: "Access Token not found" });
+      res.status(401).json({ message: "Access Token not foundH" });
       return;
     }
 

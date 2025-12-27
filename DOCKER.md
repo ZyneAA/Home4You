@@ -9,6 +9,8 @@ This project is containerized using Docker and Docker Compose.
 
 ## Quick Start
 
+### Production
+
 1. **Create a `.env` file** in the project root with all required environment variables (see `src/shared/validations/env.validation.mts` for the complete list).
 
    Required variables:
@@ -25,24 +27,41 @@ This project is containerized using Docker and Docker Compose.
 
    ```bash
    docker-compose up -d
+   # or use Makefile
+   make up
    ```
 
 3. **View logs:**
 
    ```bash
    docker-compose logs -f app
+   # or use Makefile
+   make logs
    ```
 
 4. **Stop all services:**
 
    ```bash
    docker-compose down
+   # or use Makefile
+   make down
    ```
 
-5. **Stop and remove volumes (clean slate):**
-   ```bash
-   docker-compose down -v
-   ```
+### Development
+
+For development with hot reload:
+
+```bash
+# Using docker-compose directly
+docker-compose -f docker-compose.dev.yml up -d
+
+# Or using Makefile (recommended)
+make dev          # Start and follow logs
+make dev-up       # Start in background
+make dev-logs     # View logs
+```
+
+The development setup automatically rebuilds TypeScript on file changes and restarts the server.
 
 ## Services
 
@@ -61,15 +80,35 @@ docker build -t home4you:latest .
 
 ## Development
 
-For development, you may want to mount the source code as a volume. Modify `docker-compose.yml` to add:
+For development with hot reload, use `docker-compose.dev.yml`:
 
-```yaml
-volumes:
-  - ./src:/app/src:ro
-  - ./package.json:/app/package.json:ro
+```bash
+# Start development services
+docker-compose -f docker-compose.dev.yml up -d
+
+# View logs
+docker-compose -f docker-compose.dev.yml logs -f app
+
+# Stop development services
+docker-compose -f docker-compose.dev.yml down
 ```
 
-Note: The application runs the built version from the `build/` directory, so you'll need to rebuild or use a development setup.
+Or use the Makefile commands:
+
+```bash
+make dev          # Start dev and follow logs
+make dev-up       # Start dev services
+make dev-logs     # View dev logs
+make dev-down     # Stop dev services
+make dev-shell    # Open shell in dev container
+```
+
+The development setup includes:
+
+- **Hot reload**: Automatically rebuilds TypeScript on file changes in `src/`
+- **Volume mounts**: Source code is mounted for instant changes
+- **Development defaults**: Sensible defaults for JWT secrets and other configs
+- **Separate volumes**: Uses `-dev` suffixed volumes to keep dev/prod data separate
 
 ## Environment Variables
 
