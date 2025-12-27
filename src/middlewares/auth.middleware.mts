@@ -37,6 +37,7 @@ export const protect: RequestHandler = async (
       }
     } catch (e) {
       logger.error(e);
+      return next(new AppError("Redis error", 500));
     }
 
     const user = await User.findById(userId);
@@ -49,7 +50,6 @@ export const protect: RequestHandler = async (
 
     req.user = user;
 
-    logger.info(user);
     next();
   } catch (error) {
     logger.error(error);

@@ -1,4 +1,3 @@
-import { protect } from "@middlewares";
 import { Router } from "express";
 import mongoose from "mongoose";
 
@@ -6,9 +5,9 @@ import { checkHealth } from "./health.controller.mjs";
 
 const router = Router();
 
-router.get("/health", protect, checkHealth);
+router.get("/health", checkHealth);
 
-router.get("/readyz", protect, (_req, res) => {
+router.get("/readyz", (_req, res) => {
   const isReady = mongoose.connection.readyState === 1;
   if (isReady) {
     return res.status(200).json({ status: "READY" });

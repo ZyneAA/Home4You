@@ -1,0 +1,7 @@
+{
+  "watch": ["src"],
+  "ext": "mts,ts,json",
+  "ignore": ["src/tests/**", "node_modules/**", "build/**"],
+  "exec": "npm run build",
+  "delay": 500
+}
