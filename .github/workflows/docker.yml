@@ -50,6 +50,6 @@ jobs:
 
             # Navigate to app folder and update
             cd ~/app
-            sudo docker compose pull
-            sudo docker compose up -d --remove-orphans
+            sudo docker-compose pull
+            sudo docker-compose up -d --remove-orphans
             sudo docker image prune -f
