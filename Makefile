@@ -13,6 +13,12 @@ help:
 	@echo "$(BLUE)Available commands:$(NC)"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(NC) %s\n", $$1, $$2}'
 
+deploy: ## Pull latest images from GHCR and restart
+	@echo "$(BLUE)Deploying latest images from GHCR...$(NC)"
+	docker compose pull
+	docker compose up -d --remove-orphans
+	docker image prune -f
+
 # Production commands
 build:
 	@echo "$(BLUE)Building production image...$(NC)"
