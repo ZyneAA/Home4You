@@ -2,7 +2,7 @@ name: Docker imaging building and pushing to GHCR
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 env:
   REGISTRY: ghcr.io
@@ -35,6 +35,8 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -45,7 +47,7 @@ jobs:
           script: |
             # Log in to GHCR on the EC2
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
+
             # Navigate to app folder and update
             cd ~/app
             docker compose pull
