@@ -29,6 +29,10 @@ RUN npm ci --omit=dev --only=production && npm cache clean --force
 # Copy built files from builder stage
 COPY --from=builder /app/build ./build
 
+# Copy wait-for-services script
+COPY wait-for-services.sh /wait-for-services.sh
+RUN chmod +x /wait-for-services.sh
+
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
@@ -45,5 +49,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD node -e "const net=require('net');const c=net.createConnection(8000,'localhost');c.on('connect',()=>{c.end();process.exit(0)});c.on('error',()=>process.exit(1))"
 
 # Start the application
-CMD ["node", "./build/index.mjs"]
-
+CMD ["/wait-for-services.sh", "node", "./build/index.mjs"]
