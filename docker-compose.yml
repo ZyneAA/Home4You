@@ -1,5 +1,9 @@
 services:
   app:
+    # Use image from GHCR if IMAGE_NAME is set, otherwise build locally
+    # For production on EC2, set IMAGE_NAME env var to the GHCR image name
+    # For local development, leave IMAGE_NAME unset to use build
+    image: ${IMAGE_NAME:-home4you:local}
     build:
       context: .
       dockerfile: Dockerfile
