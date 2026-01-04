@@ -29,6 +29,9 @@ RUN npm ci --omit=dev --only=production && npm cache clean --force
 # Copy built files from builder stage
 COPY --from=builder /app/build ./build
 
+# Install netcat for wait-for-services script
+RUN apk add --no-cache netcat-openbsd
+
 # Copy wait-for-services script
 COPY wait-for-services.sh /wait-for-services.sh
 RUN chmod +x /wait-for-services.sh
