@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const createUserDtoSchema = z.object({
   body: z.object({
-    fullName: z.string().min(2, "Full name must be at least 2 characters"),
+    userName: z.string().min(2, "User name must be atleast 2 characters"),
     email: z.email(),
     password: z
       .string()
