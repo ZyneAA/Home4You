@@ -155,7 +155,7 @@ export const authService = {
       jti: string;
       exp: number;
     };
-    const ttlSeconds = Math.floor((exp - Date.now()) / 1000);
+    const ttlSeconds = Math.floor(exp - Date.now() / 1000);
     if (ttlSeconds > 0) {
       await redisClient.set(jti, "blacklisted_jti", {
         expiration: { type: "EX", value: ttlSeconds },
@@ -277,22 +277,6 @@ export const authService = {
       await session.endSession();
     }
   },
-
-  // async forgotPassword(email: string) {
-  //   try {
-  //     const user = User.findOne({ email });
-  //     if (!user) {
-
-  //     }
-
-  //   } catch (e) {
-
-  //   }
-  // },
-
-  // async resetPasswrod(otp: string, email: string) {
-
-  // },
 
   async lockAccount(user: IUser, session: ClientSession) {
     if (user.failedLoginAttempts !== undefined) {

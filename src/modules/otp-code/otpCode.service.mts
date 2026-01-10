@@ -10,7 +10,7 @@ import argon2 from "argon2";
 import mongoose, { type ClientSession } from "mongoose";
 
 import type { Channel } from "./types/channel.type.mjs";
-import type { OtpType } from "./types/otpType.type.mjs";
+import { OtpType } from "./types/otpType.type.mjs";
 
 export const otpCodeService = {
   async generateOtp(length: number): Promise<string> {
@@ -138,6 +138,16 @@ export const otpCodeService = {
       }
       if (user.lockUntil && user.lockUntil > new Date(Date.now())) {
         throw new AppError(`Account locked. Try again after sometime`, 423);
+      }
+      if (!user.emailVerified) {
+        if (type === OtpType.SIGNUP) {
+          user.emailVerified = true;
+        } else {
+          throw new AppError("Account is not verified", 401);
+        }
+      }
+      if (type === OtpType.SIGNUP && user.emailVerified) {
+        throw new AppError("Account already verified", 400);
       }
 
       const otpCode = await OtpCode.findOne({ userId: user.id, type })

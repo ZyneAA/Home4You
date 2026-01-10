@@ -12,17 +12,22 @@ export const userService = {
     userData: CreateUserDto,
     session: ClientSession,
   ): Promise<IUser> {
-    const existingUser = await User.findOne({ email: userData.email }).session(
-      session,
-    );
+    const existingUser = await User.findOne({
+      userName: userData.userName,
+      email: userData.email,
+    }).session(session);
+
     if (existingUser) {
+      if (existingUser?.userName === userData.userName) {
+        throw new AppError("User name already taken.", 409);
+      }
       throw new AppError("An account with this email already exists.", 409);
     }
 
     const newUser = new User(
       {
         _id: new mongoose.Types.ObjectId(),
-        fullName: userData.fullName,
+        userName: userData.userName,
         email: userData.email,
       },
       { session },
@@ -41,6 +46,14 @@ export const userService = {
 
   async getUserById(id: string): Promise<IUser> {
     const user = await User.findById(id);
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+    return user;
+  },
+
+  async getUserByUserName(userName: string): Promise<IUser> {
+    const user = await User.findOne({ userName });
     if (!user) {
       throw new AppError("User not found", 404);
     }

@@ -5,7 +5,7 @@ const uuidRegex =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const baseSchema = z.object({
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
+  userName: z.string().min(2, "User name must be at least 2 characters"),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")

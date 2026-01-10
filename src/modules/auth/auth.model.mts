@@ -43,7 +43,7 @@ const AuthSessionSchema = new Schema<IAuthSession>(
       index: true,
     },
   },
-  { timestamps: true },
+  { timestamps: true, optimisticConcurrency: true },
 );
 
 export const AuthSession = model<IAuthSession>(
