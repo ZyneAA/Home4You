@@ -134,10 +134,14 @@ export const otpCodeService = {
 
       const user = await User.findOne({ email }).session(session);
       if (!user) {
-        throw new AppError("Invalid email", 404);
+        throw new AppError("Invalid credentials", 404);
       }
       if (user.lockUntil && user.lockUntil > new Date(Date.now())) {
         throw new AppError(`Account locked. Try again after sometime`, 423);
+      }
+
+      if (type === OtpType.SIGNUP && user.emailVerified) {
+        throw new AppError("Account already verified", 400);
       }
       if (!user.emailVerified) {
         if (type === OtpType.SIGNUP) {
@@ -145,9 +149,6 @@ export const otpCodeService = {
         } else {
           throw new AppError("Account is not verified", 401);
         }
-      }
-      if (type === OtpType.SIGNUP && user.emailVerified) {
-        throw new AppError("Account already verified", 400);
       }
 
       const otpCode = await OtpCode.findOne({ userId: user.id, type })
