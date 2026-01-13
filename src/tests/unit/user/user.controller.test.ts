@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 
 import { validateDto } from "../../../middlewares/validation.middleware.mts";
 import { createUserDtoSchema } from "../../../modules/user/dtos/create-user.dto.mts";
+import { AppError } from "../../../utils/appError.mts";
 
 vi.mock("@utils", () => ({
   logger: {
