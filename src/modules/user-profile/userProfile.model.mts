@@ -7,11 +7,13 @@ const UserProfileSchema = new Schema<IUserProfile>(
     userId: { type: Schema.ObjectId, ref: "User", unique: true, index: true },
 
     fullName: { type: String },
+    education: { type: String },
     bio: { type: String },
     avatarUrl: { type: String },
 
     location: {
       city: String,
+      state: String,
     },
   },
   { timestamps: true },
