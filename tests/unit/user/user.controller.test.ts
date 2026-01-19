@@ -1,11 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
 import { Request, Response, NextFunction } from "express";
 
-import { validateDto } from "../../../middlewares/validation.middleware.mts";
-import { createUserDtoSchema } from "../../../modules/user/dtos/create-user.dto.mts";
-import { AppError } from "../../../utils/appError.mts";
+import { validateDto } from "../../../src/middlewares/validation.middleware.mts";
+import { createUserDtoSchema } from "../../../src/modules/user/dtos/create-user.dto.mts";
+import { AppError } from "../../../src/utils/appError.mts";
 
-vi.mock("@utils", () => ({
+vi.mock("../../../src/utils/index.mts", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
@@ -14,7 +14,7 @@ vi.mock("@utils", () => ({
 }));
 
 // Mock the user service
-vi.mock("../../../modules/user/user.service.mts", () => ({
+vi.mock("../../../src/modules/user/user.service.mts", () => ({
   userService: {
     createUser: vi.fn(),
   },

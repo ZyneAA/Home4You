@@ -1,11 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
 import { Request, Response, NextFunction } from "express";
 
-import { passwordForgetController } from "../../../modules/password-forget/password-forget.controller.mts";
-import { passwordForgetService } from "../../../modules/password-forget/password-forget.service.mts";
-import { AppError } from "../../../utils/appError.mts";
+import { passwordForgetController } from "../../../src/modules/password-forget/password-forget.controller.mts";
+import { passwordForgetService } from "../../../src/modules/password-forget/password-forget.service.mts";
+import { AppError } from "../../../src/utils/appError.mts";
 
-vi.mock("@utils", () => ({
+vi.mock("../../../src/utils/index.mts", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
@@ -13,12 +13,15 @@ vi.mock("@utils", () => ({
   },
 }));
 
-vi.mock("../../../modules/password-forget/password-forget.service.mts", () => ({
-  passwordForgetService: {
-    forgotPassword: vi.fn(),
-    resetPassword: vi.fn(),
-  },
-}));
+vi.mock(
+  "../../../src/modules/password-forget/password-forget.service.mts",
+  () => ({
+    passwordForgetService: {
+      forgotPassword: vi.fn(),
+      resetPassword: vi.fn(),
+    },
+  }),
+);
 
 describe("PasswordForgetController", () => {
   describe("forgotPassword", () => {

@@ -1,11 +1,10 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import crypto from "crypto";
 
-import { otpCodeService } from "../../../modules/otp-code/otpCode.service.mts";
-import { transporter } from "@config";
-import { AppError } from "../../../utils/appError.mts";
+import { otpCodeService } from "../../../src/modules/otp-code/otpCode.service.mts";
+import { transporter } from "../../../src/config/mailer.mts";
+import { AppError } from "../../../src/utils/appError.mts";
 
-vi.mock("@utils", () => ({
+vi.mock("../../../src/utils/index.mts", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
@@ -13,7 +12,7 @@ vi.mock("@utils", () => ({
   },
 }));
 
-vi.mock("@config", () => ({
+vi.mock("../../../src/config/index.mts", () => ({
   transporter: {
     sendMail: vi.fn(),
   },
@@ -22,7 +21,7 @@ vi.mock("@config", () => ({
   },
 }));
 
-vi.mock("../../../modules/otp-code/otpCode.model.mts", () => ({
+vi.mock("../../../src/modules/otp-code/otpCode.model.mts", () => ({
   OtpCode: {
     deleteMany: vi.fn(),
     create: vi.fn(),
@@ -31,7 +30,7 @@ vi.mock("../../../modules/otp-code/otpCode.model.mts", () => ({
   },
 }));
 
-vi.mock("../../../modules/user/user.model.mts", () => ({
+vi.mock("../../../src/modules/user/user.model.mts", () => ({
   User: {
     findOne: vi.fn(),
   },

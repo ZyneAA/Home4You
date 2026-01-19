@@ -1,13 +1,12 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 
-import { passwordForgetService } from "../../../modules/password-forget/password-forget.service.mts";
-import { User } from "../../../modules/user/user.model.mts";
-import { OtpCode } from "../../../modules/otp-code/otpCode.model.mts";
-import { otpCodeService } from "../../../modules/otp-code/otpCode.service.mts";
-import { AppError } from "../../../utils/appError.mts";
-import { OtpType } from "../../../modules/otp-code/types/otpType.type.mts";
+import { passwordForgetService } from "../../../src/modules/password-forget/password-forget.service.mts";
+import { User } from "../../../src/modules/user/user.model.mts";
+import { OtpCode } from "../../../src/modules/otp-code/otpCode.model.mts";
+import { otpCodeService } from "../../../src/modules/otp-code/otpCode.service.mts";
+import { OtpType } from "../../../src/modules/otp-code/types/otpType.type.mts";
 
-vi.mock("@utils", () => ({
+vi.mock("../../../src/utils/index.mts", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
@@ -15,20 +14,20 @@ vi.mock("@utils", () => ({
   },
 }));
 
-vi.mock("../../../modules/user/user.model.mts", () => ({
+vi.mock("../../../src/modules/user/user.model.mts", () => ({
   User: {
     findOne: vi.fn(),
   },
 }));
 
-vi.mock("../../../modules/otp-code/otpCode.model.mts", () => ({
+vi.mock("../../../src/modules/otp-code/otpCode.model.mts", () => ({
   OtpCode: {
     findOne: vi.fn(),
     deleteOne: vi.fn(),
   },
 }));
 
-vi.mock("../../../modules/otp-code/otpCode.service.mts", () => ({
+vi.mock("../../../src/modules/otp-code/otpCode.service.mts", () => ({
   otpCodeService: {
     generateOtp: vi.fn(),
     createAndSetOtp: vi.fn(),

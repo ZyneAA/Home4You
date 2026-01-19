@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Request, Response, NextFunction } from "express";
 
-import { validateDto } from "../../middlewares/validation.middleware.mts";
-import { forgotPasswordDtoSchema } from "../../modules/password-forget/dtos/forgot-password.dto.mts";
-import { resetPasswordDtoSchema } from "../../modules/password-forget/dtos/reset-password.dto.mts";
-import { passwordForgetRoutes } from "../../modules/password-forget/password-forget.routes.mts";
-import { AppError } from "../../utils/appError.mts";
+import { validateDto } from "../../src/middlewares/validation.middleware.mts";
+import { forgotPasswordDtoSchema } from "../../src/modules/password-forget/dtos/forgot-password.dto.mts";
+import { resetPasswordDtoSchema } from "../../src/modules/password-forget/dtos/reset-password.dto.mts";
+import { passwordForgetRoutes } from "../../src/modules/password-forget/password-forget.routes.mts";
+import { AppError } from "../../src/utils/appError.mts";
 
-vi.mock("@utils", () => ({
+vi.mock("../../src/utils/index.mts", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
@@ -15,12 +15,15 @@ vi.mock("@utils", () => ({
   },
 }));
 
-vi.mock("../../modules/password-forget/password-forget.service.mts", () => ({
-  passwordForgetService: {
-    forgotPassword: vi.fn(),
-    resetPassword: vi.fn(),
-  },
-}));
+vi.mock(
+  "../../src/modules/password-forget/password-forget.service.mts",
+  () => ({
+    passwordForgetService: {
+      forgotPassword: vi.fn(),
+      resetPassword: vi.fn(),
+    },
+  }),
+);
 
 describe("Password Forget Routes Integration", () => {
   beforeEach(() => {

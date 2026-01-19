@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 import { Request, Response, NextFunction } from "express";
 
-import { authController } from "../../../modules/auth/auth.controller.mts";
-import { authService } from "../../../modules/auth/auth.service.mts";
-import { otpCodeService } from "../../../modules/otp-code/otpCode.service.mts";
-import { AppError } from "../../../utils/appError.mts";
+import { authController } from "../../../src/modules/auth/auth.controller.mts";
+import { authService } from "../../../src/modules/auth/auth.service.mts";
+import { otpCodeService } from "../../../src/modules/otp-code/otpCode.service.mts";
+import { AppError } from "../../../src/utils/appError.mts";
 
-vi.mock("@utils", () => ({
+vi.mock("../../../src/utils/index.mts", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
@@ -14,7 +14,7 @@ vi.mock("@utils", () => ({
   },
 }));
 
-vi.mock("../../../modules/auth/auth.service.mts", () => ({
+vi.mock("../../../src/modules/auth/auth.service.mts", () => ({
   authService: {
     register: vi.fn(),
     login: vi.fn(),
@@ -23,7 +23,7 @@ vi.mock("../../../modules/auth/auth.service.mts", () => ({
   },
 }));
 
-vi.mock("../../../modules/otp-code/otpCode.service.mts", () => ({
+vi.mock("../../../src/modules/otp-code/otpCode.service.mts", () => ({
   otpCodeService: {
     verifyOtp: vi.fn(),
     resendOtp: vi.fn(),

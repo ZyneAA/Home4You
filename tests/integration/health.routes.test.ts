@@ -2,10 +2,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 
-import { checkHealth } from "../../modules/health/health.controller.mts";
-import { healthCheckRoutes } from "../../modules/health/health.routes.mts";
+import { checkHealth } from "../../src/modules/health/health.controller.mts";
+import { healthCheckRoutes } from "../../src/modules/health/health.routes.mts";
 
-vi.mock("@utils", () => ({
+vi.mock("../../src/utils/index.mts", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
@@ -13,7 +13,7 @@ vi.mock("@utils", () => ({
   },
 }));
 
-vi.mock("@config", () => ({
+vi.mock("../../src/config/index.mts", () => ({
   redisClient: {
     isOpen: true,
     options: {
