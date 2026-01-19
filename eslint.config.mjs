@@ -9,15 +9,15 @@ import pluginImport from "eslint-plugin-import";
 
 export default defineConfig([
   {
-    ignores: ["build/", "node_modules/", "dist/", "coverage/", "src/tests"],
+    ignores: ["build/", "node_modules/", "dist/", "coverage/", "tests/"],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ["src/**/*.ts", "src/**/*.mts", "src/tests/**/*.ts"],
+    files: ["src/**/*.ts", "src/**/*.mts"],
     languageOptions: {
       parserOptions: {
-        project: "./tsconfig.json",
+        project: ["./tsconfig.json", "./tsconfig.test.json"],
         sourceType: "module",
         ecmaVersion: "latest",
       },

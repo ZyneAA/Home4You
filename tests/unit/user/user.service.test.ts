@@ -1,10 +1,10 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 
-import { userService } from "../../../modules/user/user.service.mts";
-import { User } from "../../../modules/user/user.model.mts";
-import { AppError } from "../../../utils/appError.mts";
+import { userService } from "../../../src/modules/user/user.service.mts";
+import { User } from "../../../src/modules/user/user.model.mts";
+import { AppError } from "../../../src/utils/appError.mts";
 
-vi.mock("@utils", () => ({
+vi.mock("../../../src/utils/index.mts", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
@@ -13,7 +13,7 @@ vi.mock("@utils", () => ({
 }));
 
 // mock mongoose model
-vi.mock("../../../modules/user/user.model.mts", () => ({
+vi.mock("../../../src/modules/user/user.model.mts", () => ({
   User: {
     findOne: vi.fn(),
     find: vi.fn(),

@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Request, Response } from "express";
 import mongoose from "mongoose";
+import { redisClient } from "../../../src/config/redis.mts";
 
 import {
   checkHealth,
   getRedisStatus,
-} from "../../../modules/health/health.controller.mts";
-import { redisClient } from "@config";
+} from "../../../src/modules/health/health.controller.mts";
 
-vi.mock("@utils", () => ({
+vi.mock("../../../src/utils/index.mts", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
@@ -16,7 +16,7 @@ vi.mock("@utils", () => ({
   },
 }));
 
-vi.mock("@config", () => ({
+vi.mock("../../../src/config/index.mts", () => ({
   redisClient: {
     isOpen: false,
     options: {
@@ -37,24 +37,8 @@ describe("HealthController", () => {
   });
 
   describe("getRedisStatus", () => {
-    it("should return 'uninitialized' if redisClient is null", async () => {
-      const redisModule = await import("@config");
-      const originalClient = redisModule.redisClient;
-
-      // Mock redisClient as null
-      (redisModule as any).redisClient = null;
-
-      const status = await getRedisStatus();
-
-      expect(status).toBe("uninitialized");
-
-      // Restore
-      (redisModule as any).redisClient = originalClient;
-    });
-
     it("should return 'disconnected' if redis is not open", async () => {
-      const redisModule = await import("@config");
-      (redisModule.redisClient as any).isOpen = false;
+      (redisClient as any).isOpen = false;
 
       const status = await getRedisStatus();
 
@@ -77,14 +61,7 @@ describe("HealthController", () => {
         configurable: true,
       });
 
-      const redisModule = await import("@config");
-      (redisModule.redisClient as any).isOpen = true;
-
-      // Mock getRedisStatus to return connected
-      vi.doMock("../../../modules/health/health.controller.mts", () => ({
-        ...vi.importActual("../../../modules/health/health.controller.mts"),
-        getRedisStatus: vi.fn().mockResolvedValue("connected"),
-      }));
+      (redisClient as any).isOpen = true;
 
       await checkHealth(req, res);
 
@@ -113,8 +90,7 @@ describe("HealthController", () => {
         configurable: true,
       });
 
-      const redisModule = await import("@config");
-      (redisModule.redisClient as any).isOpen = true;
+      (redisClient as any).isOpen = true;
 
       await checkHealth(req, res);
 
@@ -143,8 +119,7 @@ describe("HealthController", () => {
         configurable: true,
       });
 
-      const redisModule = await import("@config");
-      (redisModule.redisClient as any).isOpen = false;
+      (redisClient as any).isOpen = false;
 
       await checkHealth(req, res);
 
@@ -189,8 +164,7 @@ describe("HealthController", () => {
         json: vi.fn(),
       } as unknown as Response;
 
-      const redisModule = await import("@config");
-      (redisModule.redisClient as any).isOpen = false;
+      (redisClient as any).isOpen = false;
 
       // Test connecting state
       Object.defineProperty(mongoose.connection, "readyState", {

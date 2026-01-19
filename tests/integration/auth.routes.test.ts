@@ -1,17 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Request, Response, NextFunction } from "express";
 
-import { validateDto } from "../../middlewares/validation.middleware.mts";
-import { loginDtoSchema } from "../../modules/auth/dtos/login.dto.mts";
-import { registerDtoSchema } from "../../modules/auth/dtos/register.dto.mts";
-import { verifyOtpDtoSchema } from "../../modules/auth/dtos/verifyOtp.dto.mts";
-import { sendOtpDtoSchema } from "../../modules/auth/dtos/sendOtp.dto.mts";
-import { logoutDtoSchema } from "../../modules/auth/dtos/logout.dto.mts";
-import { refreshDtoSchema } from "../../modules/auth/dtos/refresh.dto.mts";
-import { authRoutes } from "../../modules/auth/auth.routes.mts";
-import { AppError } from "../../utils/appError.mts";
+import { validateDto } from "../../src/middlewares/validation.middleware.mts";
+import { loginDtoSchema } from "../../src/modules/auth/dtos/login.dto.mts";
+import { registerDtoSchema } from "../../src/modules/auth/dtos/register.dto.mts";
+import { verifyOtpDtoSchema } from "../../src/modules/auth/dtos/verifyOtp.dto.mts";
+import { sendOtpDtoSchema } from "../../src/modules/auth/dtos/sendOtp.dto.mts";
+import { logoutDtoSchema } from "../../src/modules/auth/dtos/logout.dto.mts";
+import { refreshDtoSchema } from "../../src/modules/auth/dtos/refresh.dto.mts";
+import { authRoutes } from "../../src/modules/auth/auth.routes.mts";
+import { AppError } from "../../src/utils/appError.mts";
 
-vi.mock("@utils", () => ({
+vi.mock("../../src/utils/logger.mts", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
@@ -23,7 +23,7 @@ vi.mock("@utils", () => ({
   },
 }));
 
-vi.mock("../../modules/auth/auth.service.mts", () => ({
+vi.mock("../../src/modules/auth/auth.service.mts", () => ({
   authService: {
     register: vi.fn(),
     login: vi.fn(),
@@ -32,7 +32,7 @@ vi.mock("../../modules/auth/auth.service.mts", () => ({
   },
 }));
 
-vi.mock("../../modules/otp-code/otpCode.service.mts", () => ({
+vi.mock("../../src/modules/otp-code/otpCode.service.mts", () => ({
   otpCodeService: {
     verifyOtp: vi.fn(),
     resendOtp: vi.fn(),
