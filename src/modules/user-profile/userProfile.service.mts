@@ -4,6 +4,11 @@ import type { UpdateUserProfileDto } from "./dtos/updateProfile.dto.mjs";
 import { UserProfile } from "./userProfile.model.mjs";
 
 export const userProfileService = {
+  async getProfile(userId: string) {
+    const profile = UserProfile.findOne({ userId }).lean();
+    return profile;
+  },
+
   async updateProfile(userId: string, updatedProfile: UpdateUserProfileDto) {
     const updateData: Partial<UpdateUserProfileDto> = {};
 
