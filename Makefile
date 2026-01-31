@@ -46,7 +46,7 @@ clean:
 # Development commands
 dev-up:
 	@echo "$(BLUE)Starting development services...$(NC)"
-	docker compose -f docker-compose.dev.yml up -d
+	docker compose -f docker-compose.dev.yml up --watch
 	@echo "$(GREEN)Development services started!$(NC)"
 	@echo "$(BLUE)View logs with: make dev-logs$(NC)"
 

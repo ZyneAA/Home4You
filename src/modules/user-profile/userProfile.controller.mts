@@ -5,6 +5,26 @@ import type { UpdateUserProfileDto } from "./dtos/updateProfile.dto.mjs";
 import { userProfileService } from "./userProfile.service.mjs";
 
 export const userProfileController = {
+  async getProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = req.user;
+      if (!user) {
+        throw new AppError("Not authenticated", 401);
+      }
+
+      const profile = await userProfileService.getProfile(user.id);
+      res.status(200).json({
+        ...user.toObject(),
+        ...profile,
+        userId: undefined,
+        __v: undefined,
+        _id: undefined,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async updateProfile(
     req: Request<unknown, unknown, UpdateUserProfileDto>,
     res: Response,

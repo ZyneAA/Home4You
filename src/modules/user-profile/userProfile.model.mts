@@ -16,7 +16,13 @@ const UserProfileSchema = new Schema<IUserProfile>(
       state: String,
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    optimisticConcurrency: true,
+    toJSON: {
+      virtuals: true,
+    },
+  },
 );
 
 export const UserProfile = model("UserProfile", UserProfileSchema);
