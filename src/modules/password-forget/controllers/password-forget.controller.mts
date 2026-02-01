@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 
-import type { ForgotPasswordDto } from "./dtos/forgot-password.dto.mjs";
-import type { ResetPasswordDto } from "./dtos/reset-password.dto.mjs";
-import { passwordForgetService } from "./password-forget.service.mjs";
+import type { ForgotPasswordDto } from "../dtos/forgot-password.dto.mjs";
+import type { ResetPasswordDto } from "../dtos/reset-password.dto.mjs";
+import { passwordForgetService } from "../password-forget.service.mjs";
 
 export const passwordForgetController = {
   async forgotPassword(

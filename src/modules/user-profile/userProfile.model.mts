@@ -6,14 +6,26 @@ const UserProfileSchema = new Schema<IUserProfile>(
   {
     userId: { type: Schema.ObjectId, ref: "User", unique: true, index: true },
 
-    fullName: { type: String },
-    education: { type: String },
-    bio: { type: String },
-    avatarUrl: { type: String },
+    fullName: { type: String, required: true, trim: true },
+    avatarUrl: { type: String, default: "" },
+    bio: { type: String, default: "" },
+    education: { type: String, default: "" },
+
+    socials: { type: [String] },
+
+    rating: { type: Number, default: 0.0 },
+    verified: { type: Boolean, default: false },
+
+    position: { type: String, default: "" },
+
+    postCount: { type: Number, default: 0 },
+    reviewCount: { type: Number, default: 0 },
+    savedPostCount: { type: Number, default: 0 },
+    soldOutPropertyCount: { type: Number, default: 0 },
 
     location: {
+      township: String,
       city: String,
-      state: String,
     },
   },
   {

@@ -10,34 +10,46 @@ export const userProfileService = {
   },
 
   async updateProfile(userId: string, updatedProfile: UpdateUserProfileDto) {
-    const updateData: Partial<UpdateUserProfileDto> = {};
-
-    if (updatedProfile.fullName !== undefined) {
-      updateData.fullName = updatedProfile.fullName;
-    }
-
-    if (updatedProfile.education !== undefined) {
-      updateData.education = updatedProfile.education;
-    }
-
-    if (updatedProfile.bio !== undefined) {
-      updateData.bio = updatedProfile.bio;
-    }
-
-    if (Object.keys(updateData).length === 0) {
+    if (!updatedProfile || Object.keys(updatedProfile).length === 0) {
       throw new AppError("No fields to update", 400);
     }
 
-    await UserProfile.findOneAndUpdate(
+    const updateData: any = {};
+
+    const allowedFields = [
+      "fullName",
+      "education",
+      "bio",
+      "avatarUrl",
+      "position",
+      "socials",
+    ];
+
+    allowedFields.forEach(field => {
+      if (updatedProfile[field] !== undefined) {
+        updateData[field] = updatedProfile[field];
+      }
+    });
+
+    if (updatedProfile.location) {
+      if (updatedProfile.location.township) {
+        updateData["location.township"] = updatedProfile.location.township;
+      }
+      if (updatedProfile.location.city) {
+        updateData["location.city"] = updatedProfile.location.city;
+      }
+    }
+
+    const profile = await UserProfile.findOneAndUpdate(
       { userId },
       { $set: updateData },
-      { new: true, upsert: true },
-    );
+      {
+        new: true,
+        upsert: true,
+        runValidators: true, // ensures DTO doesn't bypass Mongoose rules
+      },
+    ).lean();
 
-    return "Profile updated successfully";
-  },
-
-  async updateProfilePicture() {
-    return;
+    return profile;
   },
 };

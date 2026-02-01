@@ -1,8 +1,8 @@
 import { validateDto } from "@middlewares";
 import { Router } from "express";
 
-import { updateProfileDtoSchema } from "./dtos/updateProfile.dto.mjs";
-import { userProfileController } from "./userProfile.controller.mjs";
+import { userProfileController } from "../controllers/v1/userProfile.controller.mjs";
+import { updateProfileDtoSchema } from "../dtos/updateProfile.dto.mjs";
 
 const router = Router();
 
@@ -14,4 +14,4 @@ router
     userProfileController.updateProfile,
   );
 
-export const userProfileRoutes = router;
+export default router;

@@ -1,8 +1,8 @@
 import { protect, validateDto } from "@middlewares";
 import { Router } from "express";
 
-import { updateUserDtoSchema } from "./dtos/update-user.dto.mjs";
-import { userController } from "./user.controller.mjs";
+import { userController } from "../controllers/v1/user.controller.mjs";
+import { updateUserDtoSchema } from "../dtos/update-user.dto.mjs";
 
 const router = Router();
 
@@ -12,4 +12,4 @@ router
   .patch(protect, validateDto(updateUserDtoSchema), userController.updateUser)
   .delete(protect, userController.deleteUser);
 
-export const userRoutes = router;
+export default router;

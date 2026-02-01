@@ -1,14 +1,13 @@
+import { authService } from "@modules/auth/auth.service.mjs";
+import type { LoginDto } from "@modules/auth/dtos/login.dto.mjs";
+import type { LogoutDto } from "@modules/auth/dtos/logout.dto.mjs";
+import type { RefreshDto } from "@modules/auth/dtos/refresh.dto.mjs";
+import type { RegisterDto } from "@modules/auth/dtos/register.dto.mjs";
+import type { SendOtpDto } from "@modules/auth/dtos/sendOtp.dto.mjs";
+import type { VerifyOtpDto } from "@modules/auth/dtos/verifyOtp.dto.mjs";
 import { otpCodeService } from "@modules/otp-code/otpCode.service.mjs";
 import { OtpType } from "@modules/otp-code/types/otpType.type.mjs";
 import type { Request, Response, NextFunction } from "express";
-
-import { authService } from "./auth.service.mjs";
-import type { LoginDto } from "./dtos/login.dto.mjs";
-import type { LogoutDto } from "./dtos/logout.dto.mjs";
-import type { RefreshDto } from "./dtos/refresh.dto.mjs";
-import type { RegisterDto } from "./dtos/register.dto.mjs";
-import type { SendOtpDto } from "./dtos/sendOtp.dto.mjs";
-import type { VerifyOtpDto } from "./dtos/verifyOtp.dto.mjs";
 
 function normalizeIp(ip: string | string[] | undefined): string {
   if (!ip) {

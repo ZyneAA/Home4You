@@ -1,7 +1,7 @@
 import { Router } from "express";
 import mongoose from "mongoose";
 
-import { checkHealth } from "./health.controller.mjs";
+import { checkHealth } from "../controllers/v1/health.controller.mjs";
 
 const router = Router();
 
@@ -15,4 +15,4 @@ router.get("/readyz", (_req, res) => {
   return res.status(503).json({ status: "NOT_READY" });
 });
 
-export const healthCheckRoutes = router;
+export default router;
