@@ -6,6 +6,7 @@ import { Channel } from "@modules/otp-code/types/channel.type.mjs";
 import { OtpType } from "@modules/otp-code/types/otpType.type.mjs";
 import { userService, User } from "@modules/user/index.mjs";
 import type { IUser } from "@modules/user/types/user.type.mjs";
+import { UserProfile } from "@modules/user-profile/userProfile.model.mjs";
 import { env } from "@shared/validations";
 import { jwtToken, logger } from "@utils";
 import { AppError } from "@utils";
@@ -26,6 +27,17 @@ export const authService = {
       await session.withTransaction(async () => {
         if (dto.channel === Channel.EMAIL) {
           const newUser = await userService.createUser(dto, session);
+
+          const placeholderName = `User_${crypto.randomInt(100000, 999999)}`;
+          await UserProfile.create(
+            [
+              {
+                userId: newUser.id,
+                fullName: placeholderName,
+              },
+            ],
+            { session },
+          );
           otp = await otpCodeService.generateOtp(6);
           await otpCodeService.createAndSetOtp(
             newUser.id,

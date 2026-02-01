@@ -2,13 +2,13 @@ import { validateDto } from "@middlewares";
 import { protect } from "@middlewares";
 import { Router } from "express";
 
-import { authController } from "./auth.controller.mjs";
-import { loginDtoSchema } from "./dtos/login.dto.mjs";
-import { logoutDtoSchema } from "./dtos/logout.dto.mjs";
-import { refreshDtoSchema } from "./dtos/refresh.dto.mjs";
-import { registerDtoSchema } from "./dtos/register.dto.mjs";
-import { sendOtpDtoSchema } from "./dtos/sendOtp.dto.mjs";
-import { verifyOtpDtoSchema } from "./dtos/verifyOtp.dto.mjs";
+import { authController } from "../controllers/v1/auth.controller.mjs";
+import { loginDtoSchema } from "../dtos/login.dto.mjs";
+import { logoutDtoSchema } from "../dtos/logout.dto.mjs";
+import { refreshDtoSchema } from "../dtos/refresh.dto.mjs";
+import { registerDtoSchema } from "../dtos/register.dto.mjs";
+import { sendOtpDtoSchema } from "../dtos/sendOtp.dto.mjs";
+import { verifyOtpDtoSchema } from "../dtos/verifyOtp.dto.mjs";
 
 const router = Router();
 
@@ -37,4 +37,4 @@ router.post("/login", validateDto(loginDtoSchema), authController.login);
 router.post("/logout", validateDto(logoutDtoSchema), authController.logout);
 router.post("/refresh", validateDto(refreshDtoSchema), authController.refresh);
 
-export const authRoutes = router;
+export default router;

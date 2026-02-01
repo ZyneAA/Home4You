@@ -1,8 +1,7 @@
+import type { UpdateUserProfileDto } from "@modules/user-profile/dtos/updateProfile.dto.mjs";
+import { userProfileService } from "@modules/user-profile/userProfile.service.mjs";
 import { AppError } from "@utils";
 import type { Request, Response, NextFunction } from "express";
-
-import type { UpdateUserProfileDto } from "./dtos/updateProfile.dto.mjs";
-import { userProfileService } from "./userProfile.service.mjs";
 
 export const userProfileController = {
   async getProfile(req: Request, res: Response, next: NextFunction) {

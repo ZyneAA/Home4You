@@ -1,10 +1,9 @@
-import type { Request, Response, NextFunction } from "express";
-
 import type {
   UpdateUserDto,
   UpdateUserParams,
-} from "./dtos/update-user.dto.mjs";
-import { userService } from "./user.service.mjs";
+} from "@modules/user/dtos/update-user.dto.mjs";
+import { userService } from "@modules/user/user.service.mjs";
+import type { Request, Response, NextFunction } from "express";
 
 export const userController = {
   async getAllUsers(_req: Request, res: Response, next: NextFunction) {

@@ -1,9 +1,9 @@
 import { validateDto } from "@middlewares";
 import { Router } from "express";
 
-import { forgotPasswordDtoSchema } from "./dtos/forgot-password.dto.mjs";
-import { resetPasswordDtoSchema } from "./dtos/reset-password.dto.mjs";
-import { passwordForgetController } from "./password-forget.controller.mjs";
+import { passwordForgetController } from "../controllers/password-forget.controller.mjs";
+import { forgotPasswordDtoSchema } from "../dtos/forgot-password.dto.mjs";
+import { resetPasswordDtoSchema } from "../dtos/reset-password.dto.mjs";
 
 const router = Router();
 
@@ -19,4 +19,4 @@ router.post(
   passwordForgetController.resetPassword,
 );
 
-export const passwordForgetRoutes = router;
+export default router;
