@@ -18,10 +18,13 @@ const envSchema = z.object({
 
   // DB related
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+  DATABASE_REPLICA_SET: z.string().min(1, "Database replica set is required"),
   MONGO_MAX_POOL_SIZE: z.string().regex(/^\d+$/).transform(Number).default(10),
   MONGO_MIN_POOL_SIZE: z.string().regex(/^\d+$/).transform(Number).default(2),
 
   // Redis related
+
+  // Rate limiting
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
   GLOBAL_LIMIT: z.string().regex(/^\d+$/).transform(Number).default(100),
   GLOBAL_WINDOW_SIZE: z.string().regex(/^\d+$/).transform(Number).default(15),
@@ -51,6 +54,16 @@ const envSchema = z.object({
     .regex(/^\d+$/)
     .transform(Number)
     .default(30),
+  OPT_EXPIARY: z.string().regex(/^\d+$/).transform(Number).default(300000),
+  OTP_RESEND_WINDOW_SECONDS: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .default(60),
+  SMTP_HOST: z.string(),
+  SMTP_PORT: z.string().regex(/^\d+$/).default("2525").transform(Number),
+  SMTP_USER: z.string(),
+  SMTP_PASS: z.string(),
 });
 
 const parseResult = envSchema.safeParse(process.env);

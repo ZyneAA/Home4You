@@ -1,17 +1,13 @@
 import { corsOptions } from "@config";
-import {
-  globalErrorHandler,
-  requestId,
-  globalRateLimit,
-  morganMiddleware,
-} from "@middlewares";
-import router from "@modules";
+import { globalErrorHandler, requestId, morganMiddleware } from "@middlewares";
 import { AppError } from "@utils";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
+
+import { routerV1 } from "./routes/v1.routes.mjs";
 
 const app = express();
 
@@ -29,8 +25,8 @@ app.use(cookieParser());
 app.set("trust proxy", true);
 
 // Router and middlewares
-app.use(requestId, morganMiddleware, globalRateLimit);
-app.use("/api/v1", router);
+app.use(requestId, morganMiddleware);
+app.use("/api/v1", routerV1);
 app.use((req, _res, next) => {
   const err = new AppError(
     `Can't find the endpoint on the server ${req.originalUrl}`,

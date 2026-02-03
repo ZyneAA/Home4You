@@ -1,11 +1,17 @@
 import crypto from "crypto";
 
 import { redisClient } from "@config";
-import { userService, User } from "@modules/user";
+import { otpCodeService } from "@modules/otp-code/otpCode.service.mjs";
+import { Channel } from "@modules/otp-code/types/channel.type.mjs";
+import { OtpType } from "@modules/otp-code/types/otpType.type.mjs";
+import { userService, User } from "@modules/user/index.mjs";
+import type { IUser } from "@modules/user/types/user.type.mjs";
+import { UserProfile } from "@modules/user-profile/userProfile.model.mjs";
 import { env } from "@shared/validations";
 import { jwtToken, logger } from "@utils";
 import { AppError } from "@utils";
 import argon2 from "argon2";
+import mongoose, { type ClientSession } from "mongoose";
 
 import { AuthSession } from "./auth.model.mjs";
 import type { LoginDto } from "./dtos/login.dto.mjs";
@@ -13,62 +19,106 @@ import type { LogoutDto } from "./dtos/logout.dto.mjs";
 import type { RegisterDto } from "./dtos/register.dto.mjs";
 
 export const authService = {
-  async register(
-    dto: RegisterDto,
-    ipAddress: string | unknown,
-    userAgent: string,
-  ) {
-    const user = await userService.createUser(dto);
-    const { accessToken, refreshToken } = await this.createSession(
-      user.id,
-      ipAddress,
-      userAgent,
-      dto.deviceId,
-    );
+  async register(dto: RegisterDto) {
+    const session = await mongoose.startSession();
+    let otp: string;
 
-    return {
-      accessToken,
-      refreshToken,
-      user: user.toJSON(),
-    };
-  },
+    try {
+      await session.withTransaction(async () => {
+        if (dto.channel === Channel.EMAIL) {
+          const newUser = await userService.createUser(dto, session);
 
-  async login(dto: LoginDto, ipAddress: string | unknown, userAgent: string) {
-    const user = await User.findOne({ email: dto.email }).select(
-      "+passwordHash +lockUntil +failedLoginAttempts",
-    );
-    if (!user) {
-      throw new AppError("Invalid credentials", 401);
-    }
-    if (user.lockUntil && user.lockUntil > new Date(Date.now())) {
-      // const remaining = Math.ceil((user.lockUntil - new Date(Date.now())) / 1000); // add later
-      throw new AppError(`Account locked. Try again after sometime`, 423);
-    }
-
-    if (!user.passwordHash) {
-      logger.error("Issue with password hash");
-      throw new Error("Issue with user's password");
-    }
-
-    const isPasswordValid = await argon2.verify(
-      user.passwordHash,
-      dto.password,
-    );
-    if (!isPasswordValid) {
-      if (user.failedLoginAttempts !== undefined) {
-        user.failedLoginAttempts += 1;
-
-        if (user.failedLoginAttempts >= env.FAILED_LOGIN_ATTEMPT) {
-          user.lockUntil = new Date(Date.now() + env.ACCOUNT_LOCK_DURATION);
-          user.failedLoginAttempts = 0;
+          const placeholderName = `User_${crypto.randomInt(100000, 999999)}`;
+          await UserProfile.create(
+            [
+              {
+                userId: newUser.id,
+                fullName: placeholderName,
+              },
+            ],
+            { session },
+          );
+          otp = await otpCodeService.generateOtp(6);
+          await otpCodeService.createAndSetOtp(
+            newUser.id,
+            otp,
+            OtpType.SIGNUP,
+            Channel.EMAIL,
+            session,
+          );
+        } else {
+          // impl registration with ph number
         }
+      });
+      if (dto.channel === Channel.EMAIL) {
+        await otpCodeService.sendOtp(dto.email, otp!);
+      } else {
+        // send otp with ph number
       }
 
-      await user.save({ validateBeforeSave: false });
-      throw new AppError("Invalid credentials", 401);
+      return "OTP has been sent to your email";
+    } catch (e) {
+      if (session.inTransaction()) {
+        await session.abortTransaction();
+      }
+      throw e;
+    } finally {
+      await session.endSession();
     }
+  },
 
-    return this.createSession(user.id, ipAddress, userAgent, dto.deviceId);
+  async login(dto: LoginDto) {
+    const session = await mongoose.startSession();
+    let otp: string;
+
+    try {
+      await session.withTransaction(async () => {
+        const user = await User.findOne({ email: dto.email })
+          .select("+passwordHash +lockUntil +failedLoginAttempts")
+          .session(session);
+        if (!user) {
+          throw new AppError("Invalid credentials", 401);
+        }
+        if (user.lockUntil && user.lockUntil > new Date(Date.now())) {
+          throw new AppError(`Account locked. Try again after sometime`, 423);
+        }
+
+        if (!user.passwordHash) {
+          logger.error("Issue with password hash");
+          throw new Error("Issue with user's password");
+        }
+
+        const isPasswordValid = await argon2.verify(
+          user.passwordHash,
+          dto.password,
+        );
+
+        if (!isPasswordValid) {
+          await this.lockAccount(user, session);
+          throw new AppError("Invalid credentials", 401);
+        }
+
+        otp = await otpCodeService.generateOtp(6);
+        await otpCodeService.createAndSetOtp(
+          user.id,
+          otp,
+          OtpType.LOGIN,
+          Channel.EMAIL,
+          session,
+        );
+      });
+
+      await otpCodeService.sendOtp(dto.email, otp!);
+
+      return "OTP has been sent to your email";
+    } catch (e) {
+      if (session.inTransaction()) {
+        await session.abortTransaction();
+      }
+      throw e;
+    } finally {
+      await session.endSession();
+    }
   },
 
   async createSession(
@@ -76,7 +126,8 @@ export const authService = {
     ipAddress: string | unknown,
     userAgent: string,
     deviceId: string,
-  ) {
+    session: ClientSession,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const accessToken = jwtToken.sign(userId);
 
     let refreshToken: string;
@@ -91,17 +142,22 @@ export const authService = {
     await AuthSession.deleteOne({
       user: userId,
       deviceId,
-    });
-    await AuthSession.create({
-      user: userId,
-      tokenHash,
-      userAgent,
-      ipAddress,
-      deviceId,
-      expiresAt: new Date(
-        Date.now() + env.REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
-      ),
-    });
+    }).session(session);
+    await AuthSession.create(
+      [
+        {
+          userId,
+          tokenHash,
+          userAgent,
+          ipAddress,
+          deviceId,
+          expiresAt: new Date(
+            Date.now() + env.REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
+          ),
+        },
+      ],
+      { session },
+    );
 
     return { accessToken, refreshToken };
   },
@@ -138,7 +194,7 @@ export const authService = {
 
     if (!isValid) {
       logger.warn(
-        `Logout failed for user ${tokenFromDb.user}: Token mismatch for device ${dto.deviceId}.`,
+        `Logout failed for user ${tokenFromDb.userId}: Token mismatch for device ${dto.deviceId}.`,
       );
       throw new AppError("Invalid credentials provided for logout.", 401);
     }
@@ -155,59 +211,95 @@ export const authService = {
     userAgent: string,
     deviceId: string,
   ) {
-    const tokenFromDb = await AuthSession.findOne({
-      deviceId,
-      revokedAt: null,
-      expiresAt: { $gt: new Date() }, // Ensure token is active
-    })
-      .lean()
-      .select("+tokenHash");
+    const session = await mongoose.startSession();
+    let newTokens;
 
-    if (!tokenFromDb) {
-      throw new AppError("Invalid or expired refresh token", 401);
+    try {
+      await session.withTransaction(async () => {
+        const tokenFromDb = await AuthSession.findOne({
+          deviceId,
+          revokedAt: null,
+          expiresAt: { $gt: new Date() }, // Ensure token is active
+        })
+          .session(session)
+          .lean()
+          .select("+tokenHash");
+
+        if (!tokenFromDb) {
+          throw new AppError("Invalid or expired refresh token", 401);
+        }
+
+        const userId = tokenFromDb.userId.toString();
+
+        const isValid = await argon2.verify(
+          tokenFromDb.tokenHash,
+          refreshToken,
+        );
+        if (!isValid) {
+          await AuthSession.updateMany(
+            { user: userId },
+            { revokedAt: new Date(), revokedReason: "TOKEN_REUSE_DETECTED" },
+            { session },
+          );
+          await session.commitTransaction();
+
+          logger.error(
+            `Token reuse/mismatch detected for user ${userId}. Device: ${deviceId}. All sessions revoked.`,
+          );
+          throw new AppError("Invalid refresh token (Session Terminated)", 401);
+        }
+
+        if (
+          tokenFromDb.ipAddress !== ipAddress ||
+          tokenFromDb.userAgent !== userAgent
+        ) {
+          logger.warn(
+            `Session detail changed during refresh for user ${userId}. Device: ${deviceId}. New IP: ${ipAddress}`,
+          );
+          // warn, but allow rotation for mobile apps (users change IP/network frequently).
+        }
+
+        await AuthSession.updateOne(
+          { _id: tokenFromDb._id },
+          { revokedAt: new Date(), revokedReason: "ROTATED" },
+          { session },
+        );
+
+        const user = await User.findById(userId).session(session);
+        if (!user) {
+          throw new AppError("User account no longer exists", 401);
+        }
+
+        newTokens = await this.createSession(
+          user.id,
+          ipAddress,
+          userAgent,
+          tokenFromDb.deviceId,
+          session,
+        );
+      });
+
+      return newTokens!;
+    } catch (e) {
+      if (session.inTransaction()) {
+        await session.abortTransaction();
+      }
+      throw e;
+    } finally {
+      await session.endSession();
+    }
+  },
+
+  async lockAccount(user: IUser, session: ClientSession) {
+    if (user.failedLoginAttempts !== undefined) {
+      user.failedLoginAttempts += 1;
+
+      if (user.failedLoginAttempts >= env.FAILED_LOGIN_ATTEMPT) {
+        user.lockUntil = new Date(Date.now() + env.ACCOUNT_LOCK_DURATION);
+        user.failedLoginAttempts = 0;
+      }
     }
 
-    const userId = tokenFromDb.user.toString();
-
-    const isValid = await argon2.verify(tokenFromDb.tokenHash, refreshToken);
-    if (!isValid) {
-      await AuthSession.updateMany(
-        { user: userId },
-        { revokedAt: new Date(), revokedReason: "TOKEN_REUSE_DETECTED" },
-      );
-      logger.error(
-        `Token reuse/mismatch detected for user ${userId}. Device: ${deviceId}. All sessions revoked.`,
-      );
-      throw new AppError("Invalid refresh token (Session Terminated)", 401);
-    }
-
-    if (
-      tokenFromDb.ipAddress !== ipAddress ||
-      tokenFromDb.userAgent !== userAgent
-    ) {
-      logger.warn(
-        `Session detail changed during refresh for user ${userId}. Device: ${deviceId}. New IP: ${ipAddress}`,
-      );
-      // warn, but allow rotation for mobile apps (users change IP/network frequently).
-    }
-
-    await AuthSession.updateOne(
-      { _id: tokenFromDb._id },
-      { revokedAt: new Date(), revokedReason: "ROTATED" },
-    );
-
-    const user = await User.findById(userId);
-    if (!user) {
-      throw new AppError("User account no longer exists", 401);
-    }
-
-    const newTokens = await this.createSession(
-      user.id,
-      ipAddress,
-      userAgent,
-      tokenFromDb.deviceId,
-    );
-
-    return newTokens;
+    await user.save({ validateBeforeSave: false, session });
   },
 };

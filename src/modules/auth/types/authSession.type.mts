@@ -1,7 +1,7 @@
 import type mongoose from "mongoose";
 
 export interface IAuthSession {
-  user: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   tokenHash: string;
   expiresAt: Date;
   revokedAt: Date | null;

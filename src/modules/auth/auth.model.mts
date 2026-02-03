@@ -4,10 +4,11 @@ import type { IAuthSession } from "./types/authSession.type.mjs";
 
 const AuthSessionSchema = new Schema<IAuthSession>(
   {
-    user: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     tokenHash: {
       type: String,
@@ -42,8 +43,14 @@ const AuthSessionSchema = new Schema<IAuthSession>(
       index: true,
     },
   },
-  { timestamps: true },
+  { timestamps: true, optimisticConcurrency: true },
 );
+
+AuthSessionSchema.index({
+  userId: 1,
+  deviceId: 1,
+  revokedAt: 1,
+});
 
 export const AuthSession = model<IAuthSession>(
   "AuthSession",
