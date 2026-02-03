@@ -49,6 +49,10 @@ const UserSchema = new Schema<IUser>(
   },
 );
 
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ userName: 1 }, { unique: true });
+UserSchema.index({ roles: 1 });
+
 UserSchema.methods["setPassword"] = async function (
   this: IUser,
   password: string,
