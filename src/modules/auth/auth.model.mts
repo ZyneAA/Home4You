@@ -46,6 +46,12 @@ const AuthSessionSchema = new Schema<IAuthSession>(
   { timestamps: true, optimisticConcurrency: true },
 );
 
+AuthSessionSchema.index({
+  userId: 1,
+  deviceId: 1,
+  revokedAt: 1,
+});
+
 export const AuthSession = model<IAuthSession>(
   "AuthSession",
   AuthSessionSchema,

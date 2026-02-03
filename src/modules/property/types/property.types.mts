@@ -1,19 +1,23 @@
 import type mongoose from "mongoose";
 
-export interface IProperty extends mongoose.Document {
+import type { CurrencyType } from "./currencyType.type.mjs";
+import type { PropertyCatagory } from "./propertyCatagory.type.mjs";
+import type { PropertyType } from "./propertyType.type.mjs";
+
+export interface IProperty {
   listedBy: mongoose.Types.ObjectId;
+
   title?: string;
 
   price: number;
-  currency?: string;
-  transactionType: "sale" | "rent";
+  currency?: CurrencyType;
+  transactionType: PropertyType;
 
-  location: {
+  locationReadable: string;
+  locationCoordinates?: {
     type: "Point";
     coordinates: [number, number];
   };
-
-  address?: string;
   city?: string;
   country?: string;
 
@@ -22,7 +26,7 @@ export interface IProperty extends mongoose.Document {
   numOfFloors?: number;
   areaSqFt?: number;
 
-  category?: "apartment" | "house" | "condo" | "villa" | "studio" | "land";
+  category?: PropertyCatagory;
 
   photos?: string[];
 

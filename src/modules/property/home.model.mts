@@ -1,45 +1,55 @@
 import { model, Schema } from "mongoose";
 import type { InferSchemaType } from "mongoose";
 
-const HomeSchema = new Schema(
+import { CurrencyType } from "./types/currencyType.type.mjs";
+import type { IProperty } from "./types/property.types.mjs";
+import { PropertyCatagory } from "./types/propertyCatagory.type.mjs";
+
+const PropertySchema = new Schema<IProperty>(
   {
-    price: { type: String, required: true, trim: true },
-
-    location: { type: String, required: true, trim: true },
-
-    city: { type: String, required: true, trim: true, index: true },
-
-    coord: {
-      type: {
-        lat: { type: Number, required: true },
-        lng: { type: Number, required: true },
-      },
-      _optional: true,
-      _id: false,
-    },
-
-    // Sale type: 'sale' or 'rent'
-    type: {
-      type: String,
-      required: true,
-      enum: ["sale", "rent"],
-      trim: true,
-      index: true,
-    },
-
-    photo_urls: {
-      type: [String],
-      default: [],
-    },
-
-    area: { type: String, trim: true },
-
     listedBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true,
     },
+
+    title: { type: String, default: "" },
+
+    price: { type: Number, required: true },
+    currency: { type: CurrencyType, default: CurrencyType.KYAT },
+    transactionType: {
+      type: String,
+      required: true,
+    },
+
+    locationReadable: { type: String, required: true },
+    locationCoordinates: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
+    city: { type: String, default: "" },
+    country: { type: String, default: "" },
+
+    bedrooms: { type: Number, default: "" },
+    bathrooms: { type: Number, default: "" },
+    numOfFloors: { type: Number, default: "" },
+    areaSqFt: { type: Number, default: "" },
+
+    category: { type: PropertyCatagory, default: PropertyCatagory.HOUSE },
+
+    photos: { type: [String] },
+    amenities: { type: [String] },
+
+    builtYear: { type: Number },
+    furnished: { type: Number },
   },
   {
     timestamps: true,
@@ -52,5 +62,7 @@ const HomeSchema = new Schema(
   },
 );
 
-export type CreatedHome = InferSchemaType<typeof HomeSchema>;
-export const Home = model("Home", HomeSchema);
+PropertySchema.index({ locationCoordinates: "2dsphere" });
+
+export type CreatedHome = InferSchemaType<typeof PropertySchema>;
+export const Home = model("Home", PropertySchema);
